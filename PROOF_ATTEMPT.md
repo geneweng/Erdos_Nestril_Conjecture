@@ -748,3 +748,55 @@ vertices incident only with tight edges or eliminate 4-cycles whose four edges
 are tight.  The present local analysis does not yet force such a configuration:
 graphs like the C5 blowup have `x(e) = 1` on every edge, showing that the
 remaining case may avoid tight edges entirely.
+
+## Step 9: Reduced Local Enumeration
+
+To test whether the tight-star/tight-4-cycle target is forced by the remaining
+local assumptions, I added `check_regular_trianglefree_profiles.py`.  It uses
+`geng` to enumerate connected 4-regular triangle-free graphs, parses graph6
+directly, and computes the profile of `x(e)` values.
+
+The script filters only by the necessary local criticality condition
+
+```text
+x(e) <= 4 for every edge e.
+```
+
+It does not test colorability.  The point is narrower: determine whether the
+remaining local structure already forces a tight star or tight 4-cycle.  It
+does not.
+
+Run:
+
+```sh
+python3 check_regular_trianglefree_profiles.py 10 12 14 16
+```
+
+Output from this pass:
+
+```text
+n=10: generated=2, x<=4 survivors=0
+n=12: generated=12, x<=4 survivors=4
+  survivors with tight star: 0
+  survivors with tight 4-cycle: 2
+  survivors with tight star or tight 4-cycle: 2
+n=14: generated=220, x<=4 survivors=160
+  survivors with tight star: 9
+  survivors with tight 4-cycle: 25
+  survivors with tight star or tight 4-cycle: 26
+n=16: generated=16828, x<=4 survivors=14784
+  survivors with tight star: 258
+  survivors with tight 4-cycle: 1389
+  survivors with tight star or tight 4-cycle: 1411
+```
+
+Thus most locally surviving small graphs have neither a tight star nor a
+tight 4-cycle.  The tight-`K4` list-extension obstruction from Step 8 is useful
+when such a configuration exists, but it is not forced by the current
+reductions.
+
+This pushes the next target toward non-tight deletions.  For a deleted star or
+4-cycle with edge values `x_1,...,x_4`, the available lists have lower bounds
+`x_i - 1`; since many survivors have `x <= 3` on every edge, a proof must use
+more than Hall's theorem from list sizes alone.  It must exploit the precise
+overlap pattern of the colored conflict neighborhoods.

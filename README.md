@@ -87,6 +87,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `REPORT.md` | Full write-up: methods, pruning lemmas, results, interpretation. |
 | `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Proof notes and the latest partial proof attempt. |
 | `check_degree3_cross_edges.py` | Dependency-free finite check used in `PROOF_ATTEMPT.md` to eliminate cross edges around a degree-3 vertex. |
+| `check_regular_trianglefree_profiles.py` | Dependency-free `geng`-based profiler for the remaining 4-regular triangle-free local case. |
 
 ## Reproducing the headline results
 
