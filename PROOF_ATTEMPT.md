@@ -5,12 +5,16 @@ Date: 2026-07-14
 Goal: prove that every simple graph with maximum degree at most 4 has strong
 chromatic index at most 20.
 
-Status of this pass: no complete proof.  The useful progress is a sharper
-description of what a hypothetical counterexample with a degree-3 vertex must
-look like.  The main new tools below are:
+Status: no complete proof yet.  The main progress here is that a connected
+edge-critical counterexample is shown to be 4-regular: degree-3 vertices are
+eliminated using the local Hall/recoloring obstruction plus a finite
+cross-edge check.  The main tools below are:
 
 1. a Gallai-forest constraint on the edges with exactly 20 conflicts, and
-2. a Hall-extension obstruction obtained by deleting a degree-3 vertex.
+2. a Hall-extension obstruction obtained by deleting a degree-3 vertex,
+3. a one-edge recoloring saturation lemma for the radius-2 ball, and
+4. a dependency-free finite check ruling out cross edges between the three
+   arms around a degree-3 vertex.
 
 These are intended to extend the reductions already recorded in
 `PROOF_NOTES.md`.
@@ -23,7 +27,8 @@ These are intended to extend the reductions already recorded in
 4. Try to eliminate degree-3 vertices of `H`.
 5. If that succeeds, attack the remaining 4-regular case.
 
-The pass below completes Steps 1--3 and makes partial progress on Step 4.
+The pass below completes Steps 1--4 and reduces the remaining problem to the
+4-regular case.
 
 ## Step 1: Critical Setup
 
@@ -440,3 +445,100 @@ This is strong, but still not a contradiction.  The next unresolved step is an
 external-blocker counting argument: show that the bounded-degree graph outside
 the radius-2 ball cannot supply these blockers for all edges in
 `O1 union O2 union O3` while preserving the critical local counts.
+
+## Step 6: Eliminating Degree-3 Vertices
+
+The external-blocker problem above has a useful first resolution: cross edges
+between arms cannot exist at all.
+
+### A Stronger One-Edge Recoloring Lemma
+
+Lemma 8 can be strengthened from `P union R` to all colors other than the color
+of `f`.
+
+**Lemma 9.** In every 20-coloring of `H - u`, every edge
+`f in O1 union O2 union O3` sees all 19 colors other than its own.
+
+Proof.  Lemma 8 handles colors in `P union R`.  Let `q = phi(f) in Q`, and let
+`c in Q \ {q}` be absent from the conflict neighborhood of `f`.  Recolor `f`
+from `q` to `c`.  This is still a valid 20-coloring of `H - u`.
+
+For every arm `i` with `f in Oi`, the color `q` is now available for the
+missing edge `ei`.  The color `c` was not available for `ei` before the
+recoloring anyway, because `Oi` is rainbow and contains a different edge of
+color `c`.  Arms not containing `f` still have the two available colors
+`R = {alpha,beta}`.  Thus the three missing edges have lists whose union
+contains `R union {q}`, and Hall's condition holds.  The coloring extends to
+`H`, a contradiction.
+
+So every color in `Q \ {q}` also appears in the conflict neighborhood of `f`.
+
+### No Cross Edges
+
+Consider the cross-edge graph `X` on `W1 union W2 union W3`, with parts
+`W1,W2,W3` and edges exactly the edges of `H` joining different arms.
+
+From Lemma 6, `X` is triangle-free and every vertex has cross-degree at most
+3.  Also, if `ab` is a cross edge between `Wi` and `Wj`, and `Wk` is the third
+arm, then Lemma 9 forces `ab` to see the three spoke colors in `Bk`.  The only
+way `ab` can conflict with the spoke `vk z`, `z in Wk`, is for `a z` or `b z`
+to be a cross edge.  Therefore:
+
+```text
+for every cross edge ab between two arms,
+N_X(a) union N_X(b) contains all three vertices of the third arm.
+```
+
+Together with triangle-freeness, this means the endpoints of each cross edge
+cover the third arm without overlap.
+
+The remaining statement is a 9-vertex finite lemma:
+
+**Lemma 10.** The only tripartite graph with three parts of size 3 satisfying
+the cross-degree bound, triangle-freeness, and the third-arm coverage rule
+above is the empty graph.
+
+This is verified by `check_degree3_cross_edges.py`.  The check is by closure:
+if a nonempty valid cross-edge graph existed, start from any one of its edges.
+The third-arm coverage rule forces at least one of two possible new edges for
+each uncovered third-arm vertex.  Recursing over those forced choices, while
+rejecting degree overflow and triangles, would find a nonempty closed valid
+subgraph.  The script finds none.
+
+Thus:
+
+**Corollary 11.** There are no cross edges between different arms around a
+degree-3 vertex.
+
+### Final Contradiction for a Degree-3 Vertex
+
+Let `f = w x` be any edge of `O_i`, with `w in Wi`.  By Corollary 11, `x` is
+not in any other arm and no edge joins `w` to another arm.  Lemma 9 says that
+`f` must see all nine spoke colors in `P`.
+
+The three spoke colors in `Bi` are seen locally: `f` conflicts with all three
+spokes at `vi`.  Now take a spoke `vj z` in another arm, with `j != i` and
+`z in Wj`.  The edge `f = wx` can conflict with `vj z` only if one of the
+following edges exists:
+
+```text
+w vj,  w z,  x vj,  x z.
+```
+
+The first is forbidden by the degree-3 ball structure.  The second is a cross
+edge, forbidden by Corollary 11.  The third would put `x` in `Wj`, making
+`wx` a cross edge, again forbidden.  Hence the only possible join is `x z`.
+
+Therefore, to see the six spoke colors in the two arms other than `i`, the
+single vertex `x` must be adjacent to all six corresponding vertices of
+`Wj union Wk`.  But `x` is already adjacent to `w` and `Delta(H) <= 4`, so this
+is impossible.
+
+**Theorem 12.** A connected edge-critical counterexample has no degree-3
+vertex.  Therefore every connected edge-critical counterexample at `Delta = 4`
+is 4-regular.
+
+This completes the first major target identified in `PROOF_NOTES.md`: the
+degree-3 case is eliminated.  The remaining hypothetical counterexample is
+4-regular, edge-critical, has conflict graph chromatic number 21 and clique
+number at most 20, and every edge satisfies the local budget `4t + x <= 4`.

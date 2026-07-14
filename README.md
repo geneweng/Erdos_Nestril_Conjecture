@@ -20,8 +20,8 @@ results. Full write-ups:
   complete proofs, the two computer-assisted theorems, and an assessment of
   what a full proof would take.
 * [PROOF_ATTEMPT.md](PROOF_ATTEMPT.md) — latest proof attempt: Gallai-forest
-  constraints on tight edges and a Hall-extension obstruction around any
-  degree-3 vertex.
+  constraints, Hall/recoloring obstructions, and a computer-assisted
+  elimination of degree-3 vertices in any critical counterexample.
 
 Highlights:
 
@@ -84,6 +84,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `results/` | Selected committed logs and search outputs. |
 | `REPORT.md` | Full write-up: methods, pruning lemmas, results, interpretation. |
 | `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Proof notes and the latest partial proof attempt. |
+| `check_degree3_cross_edges.py` | Dependency-free finite check used in `PROOF_ATTEMPT.md` to eliminate cross edges around a degree-3 vertex. |
 
 ## Reproducing the headline results
 
