@@ -1,0 +1,32 @@
+Exact coloring witnesses for the order-17 greedy-18 cases
+Date: 2026-07-14
+
+Command:
+python3 analyze_reduced_extremes.py --exact --witness --node-budget 5000000 \
+  --graph6 'P???E?oIPg@wdCPgGTDo?q_?' \
+  --graph6 'P??CAA_SFOJCCwL_T_?Y_@s?' \
+  --graph6 'P??CAA_sBOU_JOU_@Y?l?@Y?' \
+  --graph6 'P??CE@_E@Goe?yEoFOAw?x??'
+
+Output:
+case 1: graph6=P???E?oIPg@wdCPgGTDo?q_?
+  greedy=18 tight_edges=3 profile=x=1:8 x=2:13 x=3:10 x=4:3
+  clique=12 exact=13 checks=17:yes/23 16:yes/23 15:yes/23 14:yes/23 13:yes/4600 12:no/55331
+  color_classes=size=2:6 size=3:6 size=4:1
+case 2: graph6=P??CAA_SFOJCCwL_T_?Y_@s?
+  greedy=18 tight_edges=2 profile=x=1:9 x=2:10 x=3:13 x=4:2
+  clique=12 exact=12 checks=17:yes/23 16:yes/204 15:yes/20128 14:yes/1832127 13:yes/1669560 12:yes/92187
+  color_classes=size=2:2 size=3:10
+case 3: graph6=P??CAA_sBOU_JOU_@Y?l?@Y?
+  greedy=18 tight_edges=0 profile=x=2:34
+  clique=10 exact=13 checks=17:yes/301 16:yes/461 15:yes/1440 14:yes/24303 13:yes/9277 12:no/48192
+  color_classes=size=2:5 size=3:8
+case 4: graph6=P??CE@_E@Goe?yEoFOAw?x??
+  greedy=18 tight_edges=5 profile=x=0:2 x=1:6 x=2:13 x=3:8 x=4:5
+  clique=11 exact=12 checks=17:yes/24 16:yes/24 15:yes/24 14:yes/24 13:yes/33 12:yes/132 11:no/35620
+  color_classes=size=2:2 size=3:10
+exact histogram: 12:2 13:2
+
+Interpretation:
+The two exact-12 cases decompose into ten color classes of size 3 and two of
+size 2.  The exact-13 cases are also dominated by size-3 induced matchings.

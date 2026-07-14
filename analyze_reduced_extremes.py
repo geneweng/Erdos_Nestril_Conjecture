@@ -121,6 +121,7 @@ def structure_summary(graph: list[set[int]]) -> StructureSummary:
 class ColorCheck:
     result: bool | None
     nodes: int
+    coloring: list[int] | None = None
 
 
 def k_colorable(
@@ -140,6 +141,7 @@ def k_colorable(
         colors[vertex] = color
 
     nodes = 0
+    solution: list[int] | None = None
 
     def blocked_mask(vertex: int) -> int:
         mask = 0
@@ -150,7 +152,7 @@ def k_colorable(
         return mask
 
     def search(used: int) -> bool | None:
-        nonlocal nodes
+        nonlocal nodes, solution
         nodes += 1
         if node_budget and nodes > node_budget:
             return None
@@ -173,6 +175,7 @@ def k_colorable(
                 choice_blocked = blocked
 
         if choice == -1:
+            solution = colors.copy()
             return True
 
         existing_allowed = [c for c in range(used) if not (choice_blocked >> c) & 1]
@@ -190,7 +193,8 @@ def k_colorable(
                 return None
         return False
 
-    return ColorCheck(search(len(clique)), nodes)
+    result = search(len(clique))
+    return ColorCheck(result, nodes, solution if result is True else None)
 
 
 @dataclass
@@ -200,6 +204,7 @@ class ExactResult:
     exact: bool
     checks: list[str]
     clique_size: int
+    coloring: list[int] | None = None
 
 
 @dataclass
@@ -220,21 +225,29 @@ def exact_chromatic_range(
     clique = maximum_clique(graph)
     lower = len(clique)
     checks: list[str] = []
+    best_coloring: list[int] | None = None
 
     for k in range(upper - 1, lower - 1, -1):
         check = k_colorable(graph, k, clique, node_budget)
         if check.result is True:
             checks.append(f"{k}:yes/{check.nodes}")
             upper = k
+            best_coloring = check.coloring
             continue
         if check.result is False:
             checks.append(f"{k}:no/{check.nodes}")
             lower = k + 1
-            return ExactResult(lower, upper, lower == upper, checks, len(clique))
+            return ExactResult(lower, upper, lower == upper, checks, len(clique), best_coloring)
         checks.append(f"{k}:unknown/{check.nodes}")
-        return ExactResult(lower, upper, False, checks, len(clique))
+        return ExactResult(lower, upper, False, checks, len(clique), best_coloring)
 
-    return ExactResult(lower, upper, lower == upper, checks, len(clique))
+    return ExactResult(lower, upper, lower == upper, checks, len(clique), best_coloring)
+
+
+def color_class_summary(coloring: list[int]) -> str:
+    class_sizes = collections.Counter(coloring)
+    size_hist = collections.Counter(class_sizes.values())
+    return " ".join(f"size={size}:{size_hist[size]}" for size in sorted(size_hist))
 
 
 def passes_critical_filters(
@@ -258,6 +271,7 @@ def report_case(
     exact: bool,
     node_budget: int,
     structure: bool,
+    witness: bool,
     emit: bool = True,
 ) -> tuple[str | None, StructureSummary | None]:
     tight_edges = sum(1 for x in profile if x == 4)
@@ -288,6 +302,8 @@ def report_case(
             f"checks={' '.join(result.checks) or 'none'}",
             flush=True,
         )
+        if witness and result.coloring is not None:
+            print(f"  color_classes={color_class_summary(result.coloring)}", flush=True)
     return status, struct
 
 
@@ -300,6 +316,7 @@ def analyze(
     progress: int,
     summary_only: bool,
     structure: bool,
+    witness: bool,
 ) -> None:
     generated = 0
     local_survivors = 0
@@ -350,6 +367,7 @@ def analyze(
             exact,
             node_budget,
             structure,
+            witness,
             emit=not summary_only,
         )
         if struct is not None:
@@ -407,6 +425,7 @@ def analyze_graph6_inputs(
     exact: bool,
     node_budget: int,
     structure: bool,
+    witness: bool,
 ) -> None:
     exact_hist: collections.Counter[str] = collections.Counter()
     for index, line in enumerate(lines, start=1):
@@ -414,7 +433,17 @@ def analyze_graph6_inputs(
         profile, _ = edge_x_profile(adj)
         conflicts = conflict_graph(adj)
         greedy = dsatur_greedy(conflicts)
-        status, _ = report_case(index, line, profile, conflicts, greedy, exact, node_budget, structure)
+        status, _ = report_case(
+            index,
+            line,
+            profile,
+            conflicts,
+            greedy,
+            exact,
+            node_budget,
+            structure,
+            witness,
+        )
         if status is not None:
             exact_hist[status] += 1
     if exact:
@@ -429,6 +458,7 @@ def main() -> None:
     parser.add_argument("--critical-filters", action="store_true")
     parser.add_argument("--exact", action="store_true", help="run exact coloring on selected cases")
     parser.add_argument("--structure", action="store_true", help="report clique/independence summaries")
+    parser.add_argument("--witness", action="store_true", help="print exact coloring class-size histograms")
     parser.add_argument("--summary-only", action="store_true", help="suppress selected case details")
     parser.add_argument(
         "--node-budget",
@@ -445,12 +475,16 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if args.witness and not args.exact:
+        parser.error("--witness requires --exact")
+
     if args.graph6:
         analyze_graph6_inputs(
             args.graph6,
             exact=args.exact,
             node_budget=args.node_budget,
             structure=args.structure,
+            witness=args.witness,
         )
         return
     if args.order is None:
@@ -465,6 +499,7 @@ def main() -> None:
         progress=args.progress,
         summary_only=args.summary_only,
         structure=args.structure,
+        witness=args.witness,
     )
 
 

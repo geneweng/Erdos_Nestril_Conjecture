@@ -1003,6 +1003,33 @@ The selected conflict graphs remain dense, with minimum conflict degree at
 least 20, but their clique numbers are at most 13 and their exact chromatic
 numbers are far below the 21-critical threshold.
 
+Finally, I used the analyzer's witness mode on the four order-17 graphs whose
+deterministic greedy coloring used 18 colors:
+
+```sh
+python3 analyze_reduced_extremes.py --exact --witness --node-budget 5000000 \
+  --graph6 'P???E?oIPg@wdCPgGTDo?q_?' \
+  --graph6 'P??CAA_SFOJCCwL_T_?Y_@s?' \
+  --graph6 'P??CAA_sBOU_JOU_@Y?l?@Y?' \
+  --graph6 'P??CE@_E@Goe?yEoFOAw?x??'
+```
+
+The exact color class-size histograms are:
+
+```text
+exact 13: size=2:6 size=3:6 size=4:1
+exact 12: size=2:2 size=3:10
+exact 13: size=2:5 size=3:8
+exact 12: size=2:2 size=3:10
+```
+
+Thus the two exact-12 examples are explained by decompositions into ten
+3-edge induced matchings and two 2-edge induced matchings.  The exact-13
+examples are also dominated by 3-edge induced matchings.  This points the next
+proof attempt toward finding large induced matchings or color-class trades in
+the remaining triangle-free regular case, rather than toward clique/tight-edge
+obstructions.
+
 This is still not a structural proof, but it shows that the current worst
 greedy examples are very far from 21-chromatic conflict graphs.  The next
 computational target is to extract a common recoloring or induced-matching
