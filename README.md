@@ -30,6 +30,9 @@ Highlights:
 * **No counterexample exists on ≤ 14 vertices** (exhaustive: 40,414,906 graphs
   after provable criticality pruning — zero hits, none even reached 20 greedy
   colors).
+* The latest proof attempt reduces any critical counterexample to the
+  4-regular triangle-free case; a reduced sweep then rules out orders 15 and
+  16 as well (max greedy strong colors 17 and 18).
 * **The strong clique number of Δ ≤ 4 graphs is exactly 20** (SAT, with a
   rigorous 28-vertex reduction): the "clique version" of the conjecture holds
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
@@ -88,6 +91,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Proof notes and the latest partial proof attempt. |
 | `check_degree3_cross_edges.py` | Dependency-free finite check used in `PROOF_ATTEMPT.md` to eliminate cross edges around a degree-3 vertex. |
 | `check_regular_trianglefree_profiles.py` | Dependency-free `geng`-based profiler for the remaining 4-regular triangle-free local case. |
+| `check_reduced_small_orders.py` | Reduced exhaustive check for 15 and 16 vertices after the proof-attempt reductions. |
 
 ## Reproducing the headline results
 

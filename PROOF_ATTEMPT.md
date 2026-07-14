@@ -800,3 +800,48 @@ This pushes the next target toward non-tight deletions.  For a deleted star or
 `x_i - 1`; since many survivors have `x <= 3` on every edge, a proof must use
 more than Hall's theorem from list sizes alone.  It must exploit the precise
 overlap pattern of the colored conflict neighborhoods.
+
+## Step 10: Reduced Exhaustion for 15 and 16 Vertices
+
+The structural reductions also make the next small-order exhaustive checks
+much cheaper.
+
+The original exhaustive theorem covered all graphs on at most 14 vertices.
+After Theorems 12 and 13, a connected edge-critical counterexample on more
+vertices must be:
+
+```text
+4-regular,
+triangle-free,
+x(e) <= 4 for every edge.
+```
+
+I added `check_reduced_small_orders.py`, which enumerates exactly this reduced
+family using `geng`, then greedily colors the strong conflict graph.  A greedy
+coloring with at most 20 colors is a constructive certificate that the graph is
+not a counterexample.
+
+Run:
+
+```sh
+python3 check_reduced_small_orders.py
+```
+
+Output:
+
+```text
+n=15: generated=1606, x<=4 survivors=1340, max greedy strong colors=17
+  histogram: 10:3 11:59 12:246 13:420 14:365 15:174 16:61 17:12
+n=16: generated=16828, x<=4 survivors=14784, max greedy strong colors=18
+  histogram: 8:1 9:1 10:27 11:410 12:2919 13:5547 14:4060 15:1456 16:321 17:39 18:3
+```
+
+Therefore, conditional only on the reductions proved above, there is no
+counterexample on 15 or 16 vertices.  Combined with the original exhaustive
+search through 14 vertices, the current proof/computation package rules out
+counterexamples on at most 16 vertices.
+
+This is still not a general proof.  It does, however, give a much smaller
+search target for future computation: start directly from connected
+4-regular triangle-free graphs with `x(e) <= 4`, rather than all degree-[3,4]
+graphs.
