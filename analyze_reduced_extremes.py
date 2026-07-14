@@ -20,7 +20,7 @@ import math
 import sys
 import time
 
-from check_reduced_small_orders import conflict_graph, dsatur_greedy
+from check_reduced_small_orders import dsatur_greedy
 from check_regular_trianglefree_profiles import (
     edge_x_profile,
     iter_geng_graphs,
@@ -33,6 +33,31 @@ from check_regular_trianglefree_profiles import (
 def profile_summary(profile: tuple[int, ...]) -> str:
     compact = collections.Counter(profile)
     return " ".join(f"x={x}:{compact[x]}" for x in sorted(compact))
+
+
+def edge_list(adj: list[set[int]]) -> list[tuple[int, int]]:
+    return [(u, v) for u in range(len(adj)) for v in adj[u] if u < v]
+
+
+def conflict_graph(adj: list[set[int]]) -> list[set[int]]:
+    edges = edge_list(adj)
+    conflicts = [set() for _ in edges]
+    for i, (a, b) in enumerate(edges):
+        for j in range(i + 1, len(edges)):
+            c, d = edges[j]
+            if (
+                a == c
+                or a == d
+                or b == c
+                or b == d
+                or c in adj[a]
+                or d in adj[a]
+                or c in adj[b]
+                or d in adj[b]
+            ):
+                conflicts[i].add(j)
+                conflicts[j].add(i)
+    return conflicts
 
 
 def adjacency_masks(graph: list[set[int]]) -> list[int]:
@@ -250,6 +275,26 @@ def color_class_summary(coloring: list[int]) -> str:
     return " ".join(f"size={size}:{size_hist[size]}" for size in sorted(size_hist))
 
 
+def color_class_details(
+    adj: list[set[int]],
+    edge_data: list[tuple[int, int, int]],
+    coloring: list[int],
+) -> list[str]:
+    x_by_edge = {tuple(sorted((u, v))): x for u, v, x in edge_data}
+    groups: dict[int, list[tuple[int, int]]] = collections.defaultdict(list)
+    for edge, color in zip(edge_list(adj), coloring, strict=True):
+        groups[color].append(edge)
+
+    lines = []
+    for color in sorted(groups):
+        edges = sorted(groups[color])
+        xs = [x_by_edge[edge] for edge in edges]
+        x_summary = profile_summary(tuple(sorted(xs)))
+        edge_summary = " ".join(f"{u}-{v}:x{x_by_edge[(u, v)]}" for u, v in edges)
+        lines.append(f"    color {color}: size={len(edges)} {x_summary} edges={edge_summary}")
+    return lines
+
+
 def passes_critical_filters(
     n: int,
     adj: list[set[int]],
@@ -265,13 +310,16 @@ def passes_critical_filters(
 def report_case(
     case_no: int,
     line: str,
+    adj: list[set[int]],
     profile: tuple[int, ...],
+    edge_data: list[tuple[int, int, int]],
     conflicts: list[set[int]],
     greedy: int,
     exact: bool,
     node_budget: int,
     structure: bool,
     witness: bool,
+    witness_details: bool,
     emit: bool = True,
 ) -> tuple[str | None, StructureSummary | None]:
     tight_edges = sum(1 for x in profile if x == 4)
@@ -304,6 +352,10 @@ def report_case(
         )
         if witness and result.coloring is not None:
             print(f"  color_classes={color_class_summary(result.coloring)}", flush=True)
+            if witness_details:
+                print("  color_class_details:", flush=True)
+                for detail_line in color_class_details(adj, edge_data, result.coloring):
+                    print(detail_line, flush=True)
     return status, struct
 
 
@@ -317,6 +369,7 @@ def analyze(
     summary_only: bool,
     structure: bool,
     witness: bool,
+    witness_details: bool,
 ) -> None:
     generated = 0
     local_survivors = 0
@@ -361,13 +414,16 @@ def analyze(
         status, struct = report_case(
             selected,
             line,
+            adj,
             profile,
+            edge_data,
             conflicts,
             greedy,
             exact,
             node_budget,
             structure,
             witness,
+            witness_details,
             emit=not summary_only,
         )
         if struct is not None:
@@ -426,23 +482,27 @@ def analyze_graph6_inputs(
     node_budget: int,
     structure: bool,
     witness: bool,
+    witness_details: bool,
 ) -> None:
     exact_hist: collections.Counter[str] = collections.Counter()
     for index, line in enumerate(lines, start=1):
         adj = parse_graph6(line)
-        profile, _ = edge_x_profile(adj)
+        profile, edge_data = edge_x_profile(adj)
         conflicts = conflict_graph(adj)
         greedy = dsatur_greedy(conflicts)
         status, _ = report_case(
             index,
             line,
+            adj,
             profile,
+            edge_data,
             conflicts,
             greedy,
             exact,
             node_budget,
             structure,
             witness,
+            witness_details,
         )
         if status is not None:
             exact_hist[status] += 1
@@ -459,6 +519,7 @@ def main() -> None:
     parser.add_argument("--exact", action="store_true", help="run exact coloring on selected cases")
     parser.add_argument("--structure", action="store_true", help="report clique/independence summaries")
     parser.add_argument("--witness", action="store_true", help="print exact coloring class-size histograms")
+    parser.add_argument("--witness-details", action="store_true", help="print edge-level color classes")
     parser.add_argument("--summary-only", action="store_true", help="suppress selected case details")
     parser.add_argument(
         "--node-budget",
@@ -477,6 +538,8 @@ def main() -> None:
 
     if args.witness and not args.exact:
         parser.error("--witness requires --exact")
+    if args.witness_details and not args.witness:
+        parser.error("--witness-details requires --witness")
 
     if args.graph6:
         analyze_graph6_inputs(
@@ -485,6 +548,7 @@ def main() -> None:
             node_budget=args.node_budget,
             structure=args.structure,
             witness=args.witness,
+            witness_details=args.witness_details,
         )
         return
     if args.order is None:
@@ -500,6 +564,7 @@ def main() -> None:
         summary_only=args.summary_only,
         structure=args.structure,
         witness=args.witness,
+        witness_details=args.witness_details,
     )
 
 

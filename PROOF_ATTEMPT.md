@@ -1030,6 +1030,19 @@ proof attempt toward finding large induced matchings or color-class trades in
 the remaining triangle-free regular case, rather than toward clique/tight-edge
 obstructions.
 
+With `--witness-details`, the analyzer prints the actual original edges in
+each induced matching, annotated by their `x(e)` values.  The detailed
+witnesses show that these color classes are not simply "all tight" or "all
+non-tight" classes.  They freely mix edge types.  One greedy-18 example has
+`x(e) = 2` on all 34 edges and exact value 13; its witness consists of eight
+3-edge induced matchings and five 2-edge induced matchings, all necessarily
+using only `x=2` edges.  The exact-12 examples mix `x=0,1,2,3,4` edges across
+their 3-edge classes.
+
+So the useful phenomenon is not a special tight-edge decomposition.  It is the
+existence of many medium-size induced matchings even inside dense conflict
+graphs with minimum degree at least 20.
+
 This is still not a structural proof, but it shows that the current worst
 greedy examples are very far from 21-chromatic conflict graphs.  The next
 computational target is to extract a common recoloring or induced-matching
