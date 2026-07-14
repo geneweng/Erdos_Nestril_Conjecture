@@ -60,7 +60,7 @@ def max_clique_exact(C, limit_nodes=200):
     return best
 
 
-def sat_colorable(C, k, clique=None, solver_cls=Cadical195):
+def sat_colorable(C, k, clique=None, solver_cls=Cadical195, conf_budget=None):
     """Decide whether conflict graph C is properly k-colorable.
 
     Returns (True, coloring dict) or (False, None).
@@ -86,7 +86,14 @@ def sat_colorable(C, k, clique=None, solver_cls=Cadical195):
         cnf.append([var(v, c)])
 
     with solver_cls(bootstrap_with=cnf) as s:
-        if not s.solve():
+        if conf_budget:
+            s.conf_budget(conf_budget)
+            res = s.solve_limited()
+            if res is None:
+                return None, None  # undecided within budget
+            if not res:
+                return False, None
+        elif not s.solve():
             return False, None
         model = set(l for l in s.get_model() if l > 0)
         coloring = {}

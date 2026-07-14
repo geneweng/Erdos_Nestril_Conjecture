@@ -24,6 +24,13 @@ results — see [REPORT.md](REPORT.md) for the full write-up. Highlights:
   cycle blowups) and simulated annealing all stay well below 20; the C₅ blowup
   is an isolated peak.
 
+## Tooling
+
+This project was carried out with **Claude Code** running the **Claude Fable 5**
+model, which built the solvers, proved the pruning lemmas, and ran the searches:
+
+![Claude Code session kickoff — Claude Fable 5](session-kickoff.png)
+
 ## Key idea
 
 A strong edge coloring of G is a proper vertex coloring of the conflict graph
