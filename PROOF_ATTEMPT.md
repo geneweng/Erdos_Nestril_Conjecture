@@ -287,3 +287,156 @@ This pass did not prove the conjecture.  It did produce two reusable reductions:
 
 The degree-3 case now has a sharper target: prove that the forced palette split
 from Lemma 5 cannot persist under valid recolorings of `H - u`.
+
+## Step 5: Executing the Next Targets
+
+This section continues the plan above.  The two targets were:
+
+1. prove that sufficiently many spokes around a degree-3 vertex must be tight;
+2. use recoloring in `H - u` to break the forced two-color availability.
+
+The first target does not work as hoped, but it gives useful negative
+structure.  The second target gives a stronger saturation condition on the
+edges in the local palette split.
+
+### Exact Spoke Count
+
+Let `s = vi w` be a spoke, with `w in Wi`.  Then `s` is a 4--4 edge and has no
+common neighbor:
+
+```text
+N(vi) = {u} union Wi,
+N(w) cap ({u} union Wi \ {w}) = empty.
+```
+
+So in the 4--4 budget for `s` we have `t = 0`.  The six outer vertices of
+`S(s)` include the degree-3 vertex `u`, the two other vertices of `Wi`, and the
+three neighbors of `w` other than `vi`.  Hence the outer degree deficiency
+`D_s` is at least 1, coming from `u`.  If `x_s` denotes the number of extra
+internal edges in `S(s)` beyond the star edges, then
+
+```text
+conflicts(s) = 24 - D_s - x_s,
+1 <= D_s + x_s <= 4.
+```
+
+Consequently:
+
+```text
+s is tight  <=>  D_s + x_s = 4.
+```
+
+Thus the local degree budget alone does not force spokes to be tight.  In the
+locally tree-like case where the other neighbors of `w` have degree 4 and no
+extra internal edges occur in `S(s)`, the spoke has 23 conflicts, not 20.
+
+### Cross Edges Are Very Sparse
+
+Lemma 2 said that every cross edge between different `Wi` arms is non-tight.
+For a cross edge `c = w_i w_j`, the 4--4 count gives
+
+```text
+conflicts(c) = 24 - 4t_c - D_c - x_c.
+```
+
+Since `c` is non-tight but every edge of `H` has at least 20 conflicts,
+`conflicts(c) >= 21`, so:
+
+```text
+4t_c + D_c + x_c <= 3.
+```
+
+In particular:
+
+**Lemma 6.** Every cross edge between two different arms has `t_c = 0` and
+`D_c = 0`.  It lies in no triangle, and every outer vertex in its `S(c)` has
+degree 4.
+
+### Tight Spokes Are Scarce
+
+Combining Lemma 3 with Lemma 6 gives a useful limitation.
+
+**Lemma 7.** Around a degree-3 vertex, tight spokes can occur in at most two
+arms.  Moreover, if two arms contain `r` and `s` tight spokes respectively,
+then `(r - 1)(s - 1) <= 3`; in particular two arms cannot both have all three
+spokes tight.
+
+Proof.  If there is a tight spoke in each of the three arms, Lemma 3 forces
+the three corresponding outer endpoints to be pairwise adjacent.  These three
+outer endpoints form a triangle of cross edges, contradicting Lemma 6 because
+cross edges have no common neighbor.
+
+Now suppose tight spokes occur in exactly two arms.  Let `A` and `B` be the
+sets of their outer endpoints, with `|A| = r` and `|B| = s`.  Lemma 3 forces
+all edges of the complete bipartite graph `A--B` to be present.  For any
+particular cross edge `ab` with `a in A`, `b in B`, all edges between
+`A \ {a}` and `B \ {b}` are extra internal edges in `S(ab)`.  Lemma 6 gives
+`x_ab <= 3`, hence `(r - 1)(s - 1) <= 3`.
+
+So at most five of the nine spokes around a degree-3 vertex can be tight.
+
+This rules out the first target as stated: the current local theory does not
+force many tight spokes.  It forces the opposite, namely that at least four
+spokes are non-tight.
+
+### One-Edge Recoloring Saturation
+
+Return to a 20-coloring `phi` of `H - u` and use the notation from Lemma 5:
+
+```text
+P = colors on the nine spokes B,       |P| = 9,
+Q = colors on each Oi,                 |Q| = 9,
+R = {alpha, beta} = colors missing from every Xi.
+```
+
+Thus `P`, `Q`, and `R` partition the 20 colors, and no edge in the local set
+
+```text
+L = B union O1 union O2 union O3
+```
+
+has a color from `R`.
+
+Let `f` be an edge in `O = O1 union O2 union O3`, and let `q = phi(f) in Q`.
+Let `I(f)` be the set of arms `i` for which `f in Oi`.  Since an edge has only
+two endpoints, `I(f)` has size 1 or 2.
+
+**Lemma 8.** In every 20-coloring of `H - u`, every edge `f in O` sees every
+color in `P union R`.
+
+Proof.  Suppose some color `c in P union R` is absent from the colored conflict
+neighborhood of `f`.  Recolor `f` from `q` to `c`; this remains a valid
+20-coloring of `H - u`.
+
+If `c in R`, then for every `i in I(f)`, the edge `ei` loses availability of
+`c` but gains availability of `q`; every `i notin I(f)` still has the two
+available colors `R`.  If `c in P`, then `c` was already blocked for every
+`ei` by the spoke using color `c`, while every `i in I(f)` gains availability
+of `q`.  In both cases the three missing edges `e1,e2,e3` have lists whose
+union has size at least 3 and which satisfy Hall's condition:
+
+```text
+i in I(f):      available colors include q and at least one color of R,
+i notin I(f):  available colors are R.
+```
+
+Since `1 <= |I(f)| <= 2`, we can color one edge with `q` and the remaining
+two with the two colors of `R`, or use the analogous choice when `c in R`.
+This extends the coloring to `H`, a contradiction.  Therefore every
+`c in P union R` must already appear on a conflict of `f`.
+
+This is the clean Kempe-free version of the recoloring obstruction: every
+outer edge in the degree-3 ball is saturated by all 11 colors outside `Q`.
+
+Some of these blockers are local.  An edge of `Oi` always conflicts with the
+three spokes in arm `i`; a cross edge in `Oi cap Oj` conflicts with the six
+spokes in arms `i` and `j`.  Additional spoke blockers can occur through other
+allowed joins involving the non-`Wi` endpoint.  The rigorous conclusion is:
+for every color in `P` not represented among the local spoke conflicts of `f`,
+and for both colors in `R`, Lemma 8 requires a blocker outside the local set
+`L`.
+
+This is strong, but still not a contradiction.  The next unresolved step is an
+external-blocker counting argument: show that the bounded-degree graph outside
+the radius-2 ball cannot supply these blockers for all edges in
+`O1 union O2 union O3` while preserving the critical local counts.
