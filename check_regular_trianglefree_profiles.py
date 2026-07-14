@@ -16,11 +16,12 @@ profiles remain after the reductions in PROOF_ATTEMPT.md.
 
 from __future__ import annotations
 
+import argparse
 import collections
 from collections.abc import Iterator
-import itertools
 import subprocess
 import sys
+import time
 
 
 def iter_geng_graphs(n: int) -> Iterator[str]:
@@ -107,18 +108,15 @@ def has_tight_star(adj: list[set[int]], edge_x: dict[tuple[int, int], int]) -> b
 
 def has_tight_4cycle(adj: list[set[int]], edge_x: dict[tuple[int, int], int]) -> bool:
     n = len(adj)
-    for a, b, c, d in itertools.combinations(range(n), 4):
-        edges = [(a, b), (b, c), (c, d), (a, d)]
-        if all(y in adj[x] for x, y in edges):
-            if all(edge_x[tuple(sorted(e))] == 4 for e in edges):
-                return True
-        edges = [(a, b), (b, d), (c, d), (a, c)]
-        if all(y in adj[x] for x, y in edges):
-            if all(edge_x[tuple(sorted(e))] == 4 for e in edges):
-                return True
-        edges = [(a, c), (b, c), (b, d), (a, d)]
-        if all(y in adj[x] for x, y in edges):
-            if all(edge_x[tuple(sorted(e))] == 4 for e in edges):
+    tight_adj = [set() for _ in range(n)]
+    for (u, v), x in edge_x.items():
+        if x == 4:
+            tight_adj[u].add(v)
+            tight_adj[v].add(u)
+
+    for u in range(n):
+        for v in range(u + 1, n):
+            if len(tight_adj[u] & tight_adj[v]) >= 2:
                 return True
     return False
 
@@ -195,7 +193,7 @@ def ky_min_degree_sum(conflict_vertices: int, colors: int = 21) -> int:
     return (numerator + denominator - 1) // denominator
 
 
-def summarize(n: int) -> None:
+def summarize(n: int, progress: int = 0) -> None:
     generated = 0
     survivors = 0
     profiles: collections.Counter[tuple[int, ...]] = collections.Counter()
@@ -206,11 +204,21 @@ def summarize(n: int) -> None:
     tight_gallai_compatible = 0
     conflict_vertices = 2 * n
     min_degree_sum = ky_min_degree_sum(conflict_vertices)
+    started = time.monotonic()
 
     for line in iter_geng_graphs(n):
         generated += 1
         adj = parse_graph6(line)
         profile, edge_data = edge_x_profile(adj)
+        if progress and generated % progress == 0:
+            elapsed = time.monotonic() - started
+            print(
+                f"n={n}: generated={generated}, x<=4={survivors}, "
+                f"KY={ky_compatible}, Gallai={tight_gallai_compatible}, "
+                f"elapsed={elapsed:.1f}s",
+                file=sys.stderr,
+                flush=True,
+            )
         if max(profile, default=0) > 4:
             continue
         survivors += 1
@@ -240,9 +248,20 @@ def summarize(n: int) -> None:
 
 
 def main() -> None:
-    ns = [int(arg) for arg in sys.argv[1:]] if len(sys.argv) > 1 else [10, 12, 14]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("orders", nargs="*", type=int, help="orders to enumerate")
+    parser.add_argument(
+        "--progress",
+        type=int,
+        default=0,
+        metavar="N",
+        help="print progress after every N generated graphs",
+    )
+    args = parser.parse_args()
+
+    ns = args.orders if args.orders else [10, 12, 14]
     for n in ns:
-        summarize(n)
+        summarize(n, progress=args.progress)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,32 @@
+Reduced local profile after the proof-attempt reductions
+Date: 2026-07-14
+
+Command:
+python3 check_regular_trianglefree_profiles.py --progress 50000 17
+
+Progress:
+n=17: generated=50000, x<=4=41948, KY=41948, Gallai=40194, elapsed=35.0s
+n=17: generated=100000, x<=4=87345, KY=87345, Gallai=84582, elapsed=75.5s
+n=17: generated=150000, x<=4=134209, KY=134209, Gallai=130964, elapsed=131.0s
+
+Final output:
+n=17: generated=193900, x<=4 survivors=177228
+  KY-compatible survivors: 177228
+  tight-edge Gallai-compatible survivors: 173742
+  survivors with tight star: 1983
+  survivors with tight 4-cycle: 12675
+  survivors with tight star or tight 4-cycle: 12877
+   1721  x=0:2 x=1:12 x=2:16 x=3:4
+   1562  x=0:2 x=1:13 x=2:14 x=3:5
+   1536  x=0:2 x=1:10 x=2:16 x=3:6
+   1462  x=0:3 x=1:11 x=2:15 x=3:5
+   1437  x=0:3 x=1:13 x=2:15 x=3:3
+   1377  x=0:3 x=1:14 x=2:13 x=3:4
+   1289  x=0:2 x=1:15 x=2:14 x=3:3
+   1172  x=0:4 x=1:12 x=2:14 x=3:4
+
+Interpretation:
+Kostochka-Yancey density removes none of the order-17 local survivors.
+Gallai's tight-edge condition removes 3,486.  Tight stars and tight 4-cycles
+remain uncommon: only 12,877 of 177,228 local survivors have either one, so the
+tight-K4 deletion obstruction is still not forced by the current reductions.

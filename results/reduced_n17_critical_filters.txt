@@ -1,0 +1,23 @@
+Reduced sweep with critical-graph filters
+Date: 2026-07-14
+
+Command:
+python3 check_reduced_small_orders.py --critical-filters --progress 50000 17
+
+Progress:
+n=17: generated=50000, x<=4=41948, KY=41948, Gallai=40194, colored=40194, max_greedy=17, elapsed=34.9s
+n=17: generated=100000, x<=4=87345, KY=87345, Gallai=84582, colored=84582, max_greedy=17, elapsed=76.1s
+n=17: generated=150000, x<=4=134209, KY=134209, Gallai=130964, colored=130964, max_greedy=18, elapsed=131.5s
+
+Final output:
+n=17: generated=193900, x<=4 survivors=177228, max greedy strong colors=18
+  KY-compatible survivors: 177228
+  tight-edge Gallai-compatible survivors: 173742
+  colored after critical filters: 173742
+  histogram: 9:4 10:159 11:4409 12:32024 13:68057 14:50577 15:16005 16:2339 17:164 18:4
+
+Interpretation:
+The additional necessary critical-graph filters do not remove all of the
+largest deterministic DSATUR examples at order 17.  Four Gallai-compatible
+survivors still use 18 greedy strong colors, though every filtered survivor is
+well below the 21-color counterexample threshold.

@@ -801,15 +801,23 @@ n=16: generated=16828, x<=4 survivors=14784
   survivors with tight star: 258
   survivors with tight 4-cycle: 1389
   survivors with tight star or tight 4-cycle: 1411
+n=17: generated=193900, x<=4 survivors=177228
+  KY-compatible survivors: 177228
+  tight-edge Gallai-compatible survivors: 173742
+  survivors with tight star: 1983
+  survivors with tight 4-cycle: 12675
+  survivors with tight star or tight 4-cycle: 12877
 ```
 
 The Kostochka-Yancey density bound does not remove any of these locally
 surviving small graphs.  Gallai's tight-edge condition does remove some:
 3 of 4 survivors at order 12, 48 of 160 at order 14, and 682 of 14,784 at
-order 16.  However, many Gallai-compatible survivors remain, and most locally
-surviving small graphs still have neither a tight star nor a tight 4-cycle.
-The tight-`K4` list-extension obstruction from Step 8 is useful when such a
-configuration exists, but it is not forced by the current reductions.
+order 16, and 3,486 of 177,228 at order 17.  However, many Gallai-compatible
+survivors remain, and most locally surviving small graphs still have neither a
+tight star nor a tight 4-cycle.  At order 17, only 12,877 of 177,228 local
+survivors have either one.  The tight-`K4` list-extension obstruction from
+Step 8 is useful when such a configuration exists, but it is not forced by the
+current reductions.
 
 This pushes the next target toward non-tight deletions.  For a deleted star or
 4-cycle with edge values `x_1,...,x_4`, the available lists have lower bounds
@@ -865,6 +873,26 @@ Final output:
 n=17: generated=193900, x<=4 survivors=177228, max greedy strong colors=18
   histogram: 9:4 10:159 11:4418 12:32311 13:69157 14:51870 15:16647 16:2477 17:180 18:5
 ```
+
+I also reran order 17 with the additional critical-graph filters enabled:
+
+```sh
+python3 check_reduced_small_orders.py --critical-filters --progress 50000 17
+```
+
+Final output:
+
+```text
+n=17: generated=193900, x<=4 survivors=177228, max greedy strong colors=18
+  KY-compatible survivors: 177228
+  tight-edge Gallai-compatible survivors: 173742
+  colored after critical filters: 173742
+  histogram: 9:4 10:159 11:4409 12:32024 13:68057 14:50577 15:16005 16:2339 17:164 18:4
+```
+
+Thus the current critical-graph filters do not eliminate all of the worst
+greedy examples at order 17: four Gallai-compatible survivors still use
+18 colors under deterministic DSATUR.
 
 Therefore, conditional only on the reductions proved above, there is no
 counterexample on 15, 16, or 17 vertices.  Combined with the original exhaustive
