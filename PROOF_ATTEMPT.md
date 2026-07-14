@@ -1064,7 +1064,35 @@ backtracking.  This is weaker than the best exact values, but it is a more
 structural certificate: repeatedly finding large induced matchings already
 overcomes the deterministic DSATUR artifacts.
 
-This is still not a structural proof, but it shows that the current worst
-greedy examples are very far from 21-chromatic conflict graphs.  The next
-computational target is to extract a common recoloring or induced-matching
-mechanism explaining why these high-greedy survivors collapse so far below 20.
+I then tested whether the remaining loss came from arbitrary tie choices among
+maximum induced matchings.  The analyzer now supports randomized tie-breaking:
+at each packing step it collects up to a fixed number of maximum independent
+sets in the remaining conflict graph and tries multiple reproducible packings.
+With 500 trials and up to 64 alternatives at each step,
+
+```sh
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 \
+  --pack --pack-trials 500 --pack-candidates 64 --pack-seed 11 \
+  --summary-only --progress 50000
+```
+
+the full high-greedy layer gives:
+
+```text
+summary n=17: generated=193900, x<=4=177228, filtered=173742, selected=168
+  greedy histogram: 9:4 10:159 11:4409 12:32024 13:68057 14:50577 15:16005 16:2339 17:164 18:4
+  pack histogram: 11:5 12:133 13:30
+```
+
+So every critical-filtered order-17 graph whose deterministic DSATUR coloring
+uses at least 17 colors has an explicit coloring with at most 13 induced
+matchings found solely by repeated maximum-induced-matching removal, after
+changing only the tie choices.  On the four greedy-18 witnesses, the same
+packing budget gives color counts `13,12,13,12`, matching their exact values.
+
+This is still not a structural proof, but it is a stronger diagnosis: through
+order 17 the apparent hard cases are not just below 21, they collapse to 13
+under a purely induced-matching packing process.  The next proof target is to
+replace randomized tie choice by a deterministic structural exchange argument:
+when a maximum-induced-matching packing gets stuck above 13, find a local
+swap that increases the later packing capacity.

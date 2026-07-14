@@ -34,7 +34,8 @@ Highlights:
   4-regular triangle-free case; the remaining local profiler now also checks
   Kostochka-Yancey density and Gallai tight-edge compatibility, and a reduced
   sweep rules out orders 15, 16, and 17 as well (max greedy strong colors 17,
-  18, and 18; the order-17 high-greedy layer exact-colors to at most 16).
+  18, and 18; the order-17 high-greedy layer packs into at most 13 induced
+  matchings after randomized maximum-matching tie-breaking).
 * **The strong clique number of Δ ≤ 4 graphs is exactly 20** (SAT, with a
   rigorous 28-vertex reduction): the "clique version" of the conjecture holds
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
@@ -94,7 +95,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `check_degree3_cross_edges.py` | Dependency-free finite check used in `PROOF_ATTEMPT.md` to eliminate cross edges around a degree-3 vertex. |
 | `check_regular_trianglefree_profiles.py` | Dependency-free `geng`-based profiler for the remaining 4-regular triangle-free local case, including KY density, Gallai tight-edge filters, and `--progress` for larger orders. |
 | `check_reduced_small_orders.py` | Reduced exhaustive check after the proof-attempt reductions; defaults to 15 and 16 vertices and supports `--progress` plus `--critical-filters` for larger orders. |
-| `analyze_reduced_extremes.py` | Extracts high-greedy reduced survivors and optionally exact-colors their conflict graphs with a dependency-free bounded DSATUR backtracker; supports direct `--graph6` checks, `--summary-only`, `--structure`, `--witness`, `--witness-details`, and `--pack`. |
+| `analyze_reduced_extremes.py` | Extracts high-greedy reduced survivors and optionally exact-colors their conflict graphs with a dependency-free bounded DSATUR backtracker; supports direct `--graph6` checks, `--summary-only`, `--structure`, `--witness`, `--witness-details`, `--pack`, and randomized packing knobs `--pack-trials`, `--pack-candidates`, `--pack-seed`. |
 
 ## Reproducing the headline results
 

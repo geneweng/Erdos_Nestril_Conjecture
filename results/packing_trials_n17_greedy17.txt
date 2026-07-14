@@ -1,0 +1,34 @@
+Randomized maximum-induced-matching packing of the order-17 high-greedy layer
+Date: 2026-07-14
+
+Command:
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 --pack --pack-trials 500 --pack-candidates 64 --pack-seed 11 --summary-only --progress 50000
+
+Progress:
+n=17: generated=50000, x<=4=41948, filtered=40194, selected=31, elapsed=61.8s
+n=17: generated=100000, x<=4=87345, filtered=84582, selected=70, elapsed=133.3s
+n=17: generated=150000, x<=4=134209, filtered=130964, selected=125, elapsed=226.5s
+
+Final output:
+summary n=17: generated=193900, x<=4=177228, filtered=173742, selected=168
+  greedy histogram: 9:4 10:159 11:4409 12:32024 13:68057 14:50577 15:16005 16:2339 17:164 18:4
+  pack histogram: 11:5 12:133 13:30
+
+Four greedy-18 witnesses with the same packing budget:
+case 1: pack_colors=13 pack_classes=size=2:6 size=3:6 size=4:1
+case 2: pack_colors=12 pack_classes=size=2:2 size=3:10
+case 3: pack_colors=13 pack_classes=size=2:5 size=3:8
+case 4: pack_colors=12 pack_classes=size=2:2 size=3:10
+
+Interpretation:
+The selected layer consists of the 168 critical-filtered order-17 graphs whose
+deterministic DSATUR strong coloring uses at least 17 colors.  The earlier
+deterministic maximum-induced-matching packing colored these graphs with at
+most 15 colors.  Allowing randomized tie-breaking among up to 64 maximum
+induced matchings at each step, over 500 reproducible trials per selected
+graph, improves this to at most 13 colors for every selected graph.
+
+This is still a heuristic certificate rather than a proof for all larger
+orders, but it is a constructive collapse of the full order-17 high-greedy
+layer: the worst remaining reduced cases through order 17 are far below the
+21-color threshold using only maximum induced matching packings.

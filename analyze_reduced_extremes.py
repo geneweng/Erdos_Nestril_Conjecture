@@ -11,7 +11,9 @@ strong conflict graph.  The exact checker is dependency-free and intended for
 the few high-greedy survivors, not for full-family exact coloring.
 
 It can also color selected cases by repeatedly removing a maximum induced
-matching, giving a constructive packing heuristic to compare with DSATUR.
+matching, giving a constructive packing heuristic to compare with DSATUR.  A
+small randomized tie-breaking mode tests whether poor packings come only from
+which maximum induced matching is removed first.
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ import argparse
 import collections
 from dataclasses import dataclass
 import math
+import random
 import sys
 import time
 
@@ -109,6 +112,73 @@ def maximum_clique(graph: list[set[int]]) -> list[int]:
             excluded |= bit
             branch ^= bit
             if len(clique) + candidates.bit_count() <= len(best):
+                return
+
+    expand([], all_vertices, 0)
+    return best
+
+
+def maximum_cliques_limited(
+    graph: list[set[int]],
+    limit: int,
+    rng: random.Random | None = None,
+) -> list[list[int]]:
+    """Collect up to `limit` maximum cliques by Bron-Kerbosch search."""
+    if limit < 1:
+        return []
+
+    adj = adjacency_masks(graph)
+    all_vertices = (1 << len(graph)) - 1
+    best_size = 0
+    best: list[list[int]] = []
+
+    def vertices(mask: int) -> list[int]:
+        result = []
+        while mask:
+            bit = mask & -mask
+            result.append(bit.bit_length() - 1)
+            mask ^= bit
+        return result
+
+    def record(clique: list[int]) -> None:
+        nonlocal best_size, best
+        size = len(clique)
+        if size > best_size:
+            best_size = size
+            best = [clique.copy()]
+        elif size == best_size and len(best) < limit:
+            best.append(clique.copy())
+
+    def expand(clique: list[int], candidates: int, excluded: int) -> None:
+        if not candidates and not excluded:
+            record(clique)
+            return
+        if len(clique) + candidates.bit_count() < best_size:
+            return
+        if len(best) >= limit and len(clique) + candidates.bit_count() <= best_size:
+            return
+
+        pivot_pool = candidates | excluded
+        if pivot_pool:
+            pivot = max(vertices(pivot_pool), key=lambda v: (candidates & adj[v]).bit_count())
+            branch = candidates & ~adj[pivot]
+        else:
+            branch = candidates
+
+        branch_vertices = vertices(branch)
+        if rng is not None:
+            rng.shuffle(branch_vertices)
+
+        for v in branch_vertices:
+            bit = 1 << v
+            if not candidates & bit:
+                continue
+            expand(clique + [v], candidates & adj[v], excluded & adj[v])
+            candidates ^= bit
+            excluded |= bit
+            if len(clique) + candidates.bit_count() < best_size:
+                return
+            if len(best) >= limit and len(clique) + candidates.bit_count() <= best_size:
                 return
 
     expand([], all_vertices, 0)
@@ -293,18 +363,53 @@ def class_size_summary(classes: list[list[int]]) -> str:
     return " ".join(f"size={size}:{size_hist[size]}" for size in sorted(size_hist))
 
 
-def maximum_induced_matching_pack(graph: list[set[int]]) -> list[list[int]]:
+def maximum_induced_matching_pack(
+    graph: list[set[int]],
+    candidate_limit: int = 1,
+    rng: random.Random | None = None,
+) -> list[list[int]]:
     """Color by repeatedly removing a maximum independent set."""
     remaining = list(range(len(graph)))
     classes: list[list[int]] = []
     while remaining:
         subgraph = induced_subgraph(graph, remaining)
-        independent_set = maximum_clique(complement_graph(subgraph))
+        complement = complement_graph(subgraph)
+        if candidate_limit <= 1:
+            independent_set = maximum_clique(complement)
+        else:
+            choices = maximum_cliques_limited(complement, candidate_limit, rng)
+            if not choices:
+                choices = [maximum_clique(complement)]
+            independent_set = rng.choice(choices) if rng is not None else choices[0]
         color_class = [remaining[i] for i in independent_set]
         classes.append(color_class)
         used = set(color_class)
         remaining = [v for v in remaining if v not in used]
     return classes
+
+
+def pack_sort_key(classes: list[list[int]]) -> tuple[int, list[int]]:
+    return len(classes), [-len(cls) for cls in classes]
+
+
+def best_maximum_induced_matching_pack(
+    graph: list[set[int]],
+    trials: int,
+    candidate_limit: int,
+    seed: int,
+) -> list[list[int]]:
+    if trials <= 1:
+        rng = random.Random(seed) if candidate_limit > 1 else None
+        return maximum_induced_matching_pack(graph, candidate_limit, rng)
+
+    best: list[list[int]] | None = None
+    for trial in range(trials):
+        rng = random.Random(seed + trial)
+        classes = maximum_induced_matching_pack(graph, candidate_limit, rng)
+        if best is None or pack_sort_key(classes) < pack_sort_key(best):
+            best = classes
+    assert best is not None
+    return best
 
 
 def color_class_details(
@@ -353,6 +458,9 @@ def report_case(
     witness: bool,
     witness_details: bool,
     pack: bool,
+    pack_trials: int,
+    pack_candidates: int,
+    pack_seed: int,
     emit: bool = True,
 ) -> tuple[str | None, StructureSummary | None, int | None]:
     tight_edges = sum(1 for x in profile if x == 4)
@@ -375,12 +483,22 @@ def report_case(
     if not exact:
         pack_colors = None
         if pack:
-            packed_classes = maximum_induced_matching_pack(conflicts)
+            packed_classes = best_maximum_induced_matching_pack(
+                conflicts,
+                pack_trials,
+                pack_candidates,
+                pack_seed + 1000003 * case_no,
+            )
             pack_colors = len(packed_classes)
             if emit:
+                suffix = (
+                    f" pack_trials={pack_trials} pack_candidates={pack_candidates}"
+                    if pack_trials > 1 or pack_candidates > 1
+                    else ""
+                )
                 print(
                     f"  pack_colors={pack_colors} "
-                    f"pack_classes={class_size_summary(packed_classes)}",
+                    f"pack_classes={class_size_summary(packed_classes)}{suffix}",
                     flush=True,
                 )
         return None, struct, pack_colors
@@ -401,12 +519,22 @@ def report_case(
                     print(detail_line, flush=True)
     pack_colors = None
     if pack:
-        packed_classes = maximum_induced_matching_pack(conflicts)
+        packed_classes = best_maximum_induced_matching_pack(
+            conflicts,
+            pack_trials,
+            pack_candidates,
+            pack_seed + 1000003 * case_no,
+        )
         pack_colors = len(packed_classes)
         if emit:
+            suffix = (
+                f" pack_trials={pack_trials} pack_candidates={pack_candidates}"
+                if pack_trials > 1 or pack_candidates > 1
+                else ""
+            )
             print(
                 f"  pack_colors={pack_colors} "
-                f"pack_classes={class_size_summary(packed_classes)}",
+                f"pack_classes={class_size_summary(packed_classes)}{suffix}",
                 flush=True,
             )
     return status, struct, pack_colors
@@ -424,6 +552,9 @@ def analyze(
     witness: bool,
     witness_details: bool,
     pack: bool,
+    pack_trials: int,
+    pack_candidates: int,
+    pack_seed: int,
 ) -> None:
     generated = 0
     local_survivors = 0
@@ -480,6 +611,9 @@ def analyze(
             witness,
             witness_details,
             pack,
+            pack_trials,
+            pack_candidates,
+            pack_seed,
             emit=not summary_only,
         )
         if pack_colors is not None:
@@ -544,6 +678,9 @@ def analyze_graph6_inputs(
     witness: bool,
     witness_details: bool,
     pack: bool,
+    pack_trials: int,
+    pack_candidates: int,
+    pack_seed: int,
 ) -> None:
     exact_hist: collections.Counter[str] = collections.Counter()
     for index, line in enumerate(lines, start=1):
@@ -565,6 +702,9 @@ def analyze_graph6_inputs(
             witness,
             witness_details,
             pack,
+            pack_trials,
+            pack_candidates,
+            pack_seed,
         )
         if status is not None:
             exact_hist[status] += 1
@@ -583,6 +723,14 @@ def main() -> None:
     parser.add_argument("--witness", action="store_true", help="print exact coloring class-size histograms")
     parser.add_argument("--witness-details", action="store_true", help="print edge-level color classes")
     parser.add_argument("--pack", action="store_true", help="color by repeatedly removing maximum induced matchings")
+    parser.add_argument("--pack-trials", type=int, default=1, help="randomized maximum-matching pack trials")
+    parser.add_argument(
+        "--pack-candidates",
+        type=int,
+        default=1,
+        help="maximum matching alternatives collected at each packing step",
+    )
+    parser.add_argument("--pack-seed", type=int, default=0, help="seed for randomized packing")
     parser.add_argument("--summary-only", action="store_true", help="suppress selected case details")
     parser.add_argument(
         "--node-budget",
@@ -603,6 +751,12 @@ def main() -> None:
         parser.error("--witness requires --exact")
     if args.witness_details and not args.witness:
         parser.error("--witness-details requires --witness")
+    if args.pack_trials < 1:
+        parser.error("--pack-trials must be at least 1")
+    if args.pack_candidates < 1:
+        parser.error("--pack-candidates must be at least 1")
+    if (args.pack_trials != 1 or args.pack_candidates != 1 or args.pack_seed != 0) and not args.pack:
+        parser.error("--pack-trials, --pack-candidates, and --pack-seed require --pack")
 
     if args.graph6:
         analyze_graph6_inputs(
@@ -613,6 +767,9 @@ def main() -> None:
             witness=args.witness,
             witness_details=args.witness_details,
             pack=args.pack,
+            pack_trials=args.pack_trials,
+            pack_candidates=args.pack_candidates,
+            pack_seed=args.pack_seed,
         )
         return
     if args.order is None:
@@ -630,6 +787,9 @@ def main() -> None:
         witness=args.witness,
         witness_details=args.witness_details,
         pack=args.pack,
+        pack_trials=args.pack_trials,
+        pack_candidates=args.pack_candidates,
+        pack_seed=args.pack_seed,
     )
 
 
