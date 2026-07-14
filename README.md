@@ -33,8 +33,15 @@ Highlights:
   the C₅ blowup (20) is an isolated peak: every mutation collapses it.
 * **Critical-graph structure theory** (proved): a minimal counterexample has
   min degree 3, its degree-3 vertices pairwise at distance ≥ 3 with rigid
-  second neighborhoods, every edge in at most one triangle, and a local
-  sparsity budget 4t + D + x ≤ 4 per 4–4 edge (PROOF_NOTES.md §2).
+  tree-like 13-vertex second neighborhoods, every edge in at most one
+  triangle, a local sparsity budget 4t + D + x ≤ 4 per 4–4 edge, and a
+  "frozen rainbow" coloring rigidity around every 3–4 edge
+  (PROOF_NOTES.md §2).
+* **The conjecture is proved at Δ = 4 for**: all graphs on ≤ 14 vertices
+  (exhaustive), all **planar** graphs (Vizing + Four Color Theorem gives
+  exactly 5 × 4 = 20), all **chordal** graphs (perfection of the conflict
+  graph + our clique theorem), and the clique relaxation for all graphs
+  (PROOF_NOTES.md §4½).
 
 ## Tooling
 

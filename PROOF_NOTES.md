@@ -88,6 +88,49 @@ Consequently H is 4-regular except for a scattered independent set of degree-3
 vertices, is nearly triangle-free (Lemma C), and around every degree-3 vertex
 the second neighborhood is rigidly prescribed by B.3.
 
+**Lemma D′ (the ball around a degree-3 vertex).** Let u have degree 3 in H,
+with neighbors v₁, v₂, v₃ and Wᵢ = N(vᵢ) ∖ {u}. Then:
+1. N(u) is independent and N(vᵢ) ∩ N(vⱼ) = {u} for i ≠ j;
+2. no triangle and no 4-cycle of H passes through u;
+3. the radius-2 ball B₂(u) contains exactly 1 + 3 + 9 = 13 vertices, the sets
+   Wᵢ are pairwise disjoint and each is independent, and every vertex of
+   B₂(u) ∖ {u} has degree exactly 4;
+4. the only edges inside B₂(u) are the 12 "tree" edges u vᵢ and vᵢ w (w ∈ Wᵢ),
+   plus possibly edges between different Wᵢ, Wⱼ.
+
+*Proof.* Apply B.3 to each edge u vᵢ: x = 0 forbids every non-star edge inside
+S(u vᵢ) = {u, v₁, v₂, v₃} ∪ Wᵢ. An edge vⱼ vₖ is internal to S(u v₁), so N(u)
+is independent. An edge vⱼ w with w ∈ Wᵢ is internal to S(u vᵢ), so
+Wᵢ ∩ N(vⱼ) = ∅, giving N(vᵢ) ∩ N(vⱼ) = {u}; this also makes the Wᵢ pairwise
+disjoint (a common vertex would be a common neighbor) and rules out any 4-cycle
+u vᵢ w vⱼ u. Edges inside Wᵢ are internal to S(u vᵢ), so each Wᵢ is
+independent. Degrees are 4 by B.3. Cross edges Wᵢ–Wⱼ are the only pairs not
+internal to any S(u vₖ). ∎
+
+So each degree-3 vertex forces a rigid 13-vertex, locally tree-like
+configuration whose twelve outer vertices are all 4-valent — consistent with
+(and explaining) the absence of small counterexamples.
+
+**Lemma E (frozen rainbow).** Let e be an edge of H with *exactly* 20
+conflicts — by B.3 every 3–4 edge qualifies. Then in **every** 20-coloring of
+H − e:
+1. the 20 edges conflicting with e receive 20 distinct colors, and
+2. every edge f conflicting with e is itself frozen: the edges conflicting
+   with f (in H − e) carry all 19 colors other than f's.
+
+*Proof.* (1) Otherwise some color is absent from e's conflict set; give it
+to e, contradicting χ′ₛ(H) = 21. (2) Otherwise recolor f with a color c′
+missing from its conflict set (c′ ≠ color(f)); by (1) f's old color occurred
+only on f among e's conflicts, so it is now free for e — again a 20-coloring
+of H. ∎
+
+Lemma E is the seed of a rigidity cascade: each of the 20 edges around a 3–4
+edge must see all 20 colors, which by the same counting as Lemma A pins their
+neighborhoods' degree sums and internal edges near their extremes, propagating
+the rigidity of B.3/D′ outward. We did not complete a contradiction from this
+cascade (see §5), but it is the natural entry point for a human proof that
+critical counterexamples are 4-regular.
+
 ## 3. The clique barrier (computer-assisted theorem)
 
 The cheapest conceivable counterexample would be 21 edges that pairwise
@@ -134,6 +177,36 @@ So any counterexample has ≥ 15 vertices — and being nearly 4-regular
 (Corollary D), at least ~30 edges, with conflict graph of ≥ 30 vertices,
 chromatic number 21, clique number ≤ 20, and minimum degree ≥ 20 (Lemma A).
 
+## 4½. Graph classes where the conjecture is proved (Δ = 4)
+
+**Theorem G (planar graphs).** Every planar graph with Δ ≤ 4 satisfies
+χ′ₛ ≤ 20.
+
+*Proof.* By Vizing's theorem E(G) partitions into 5 matchings M₁,…,M₅. Fix a
+matching M and form Hₘ: vertices are the edges of M, adjacent when some edge
+of G joins them (matched edges are vertex-disjoint, so conflicts are exactly
+joins). Hₘ is obtained from a contraction minor of G (contract each matched
+edge, discard unmatched vertices), hence planar, hence 4-colorable by the Four
+Color Theorem. A proper 4-coloring of Hₘ splits M into 4 induced matchings.
+Doing this for each Mᵢ gives 5 × 4 = 20 induced matchings. ∎
+
+This instantiates the Faudree–Gyárfás–Schelp–Tuza bound χ′ₛ ≤ 4Δ + 4 for
+planar graphs, which meets the Erdős–Nešetřil bound exactly at Δ = 4.
+Fittingly, the extremal graph C₅[2] is *non-planar* (verified), so no tension.
+Random planar Δ ≤ 4 graphs tested here peaked at χ′ₛ = 12.
+
+**Theorem H (chordal graphs).** Every chordal graph with Δ ≤ 4 satisfies
+χ′ₛ ≤ 20.
+
+*Proof.* For chordal G, the conflict graph L(G)² is chordal (Cameron 1989,
+"Induced matchings"), hence perfect, so χ(L(G)²) = ω(L(G)²) ≤ 20 by
+Theorem E. ∎ (We corroborated χ = ω on 200 random chordal Δ ≤ 4 instances,
+where every generated conflict graph was itself chordal.)
+
+Together with Theorem F: the conjecture at Δ = 4 now holds for all graphs on
+≤ 14 vertices, all planar graphs, all chordal graphs, and in the clique
+relaxation for all graphs.
+
 ## 5. Why the last color is hard (assessment)
 
 By Lemma C, Δ(C) ≤ 24. The known landscape for coloring C:
@@ -158,10 +231,13 @@ graph on ≥ 15 vertices satisfying Lemmas A–D. Two honest routes forward:
 1. **Extend Theorem F by exhaustion** (n = 15 is ~4×10⁸ candidate graphs after
    Lemma-B pruning — days of CPU, feasible; n = 16 an order more). This can
    only ever push the bound, not close the conjecture.
-2. **Sharpen the HSY analysis using Lemmas B–D**: their proof of ≤ 21 already
+2. **Sharpen the HSY analysis using Lemmas B–E**: their proof of ≤ 21 already
    does heavy local case analysis; the rigidity of degree-3 neighborhoods
-   (B.3, D) and the 4t + D + x ≤ 4 budget (C) eliminate many of their
-   configurations at the 20-color level. Whether the remaining cases close is
+   (B.3, D, D′), the 4t + D + x ≤ 4 budget (C), and the frozen-rainbow
+   propagation (E) eliminate many of their configurations at the 20-color
+   level. The most promising first target: prove that a critical
+   counterexample must be **4-regular** by driving the Lemma E cascade around
+   a degree-3 vertex to a contradiction. Whether the remaining cases close is
    beyond what was checked here — this is where a genuine proof attempt should
    concentrate.
 
