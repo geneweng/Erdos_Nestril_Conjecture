@@ -945,9 +945,41 @@ Thus none of the four order-17 critical-filtered greedy-18 graphs is close to
 being a 21-chromatic conflict graph: their exact conflict chromatic numbers are
 `13, 12, 13, 12`.
 
-This is not a new reduction, because the remaining 164 critical-filtered
-order-17 survivors with greedy value 17 have not all been exact-checked.  It
-does show that the current worst greedy examples are heuristic artifacts, not
-near-counterexamples.  The next computational target is to exact-check the
-greedy-17 layer or to extract a structural reason that these high-greedy
-survivors recolor so far below 20.
+I then exact-checked the full critical-filtered order-17 layer with greedy
+value at least 17:
+
+```sh
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 --exact --summary-only --node-budget 500000 --progress 50000
+```
+
+This selects 168 graphs: 164 with greedy value 17 and the four with greedy
+value 18.  With the 500,000-node budget, 148 cases settle exactly:
+
+```text
+exact histogram: 11:9 11..13:4 11..14:1 11..15:1 12:130 12..13:3 12..14:5 12..15:5 13:9 13..16:1
+```
+
+Rerunning only the 20 unresolved graph6 strings with a 5,000,000-node budget
+settles 16 more:
+
+```text
+exact histogram: 11..13:1 12:8 12..14:2 13:8 13..16:1
+```
+
+Thus, among the 168 high-greedy critical-filtered order-17 survivors:
+
+```text
+exact 11: 9
+exact 12: 138
+exact 13: 17
+unresolved but <= 13: 1
+unresolved but <= 14: 2
+unresolved but <= 16: 1
+```
+
+In particular every high-greedy order-17 survivor has a certified 16-color
+strong coloring, and all fully settled cases have exact value at most 13.
+This is still not a structural proof, but it shows that the current worst
+greedy examples are very far from 21-chromatic conflict graphs.  The next
+computational target is to extract a common recoloring/degeneracy mechanism
+explaining why these high-greedy survivors collapse so far below 20.

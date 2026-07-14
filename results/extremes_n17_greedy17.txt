@@ -1,0 +1,44 @@
+Bounded exact analysis of the order-17 high-greedy layer
+Date: 2026-07-14
+
+Command:
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 --exact --summary-only --node-budget 500000 --progress 50000
+
+Progress:
+n=17: generated=50000, x<=4=41948, filtered=40194, selected=31, elapsed=75.0s
+n=17: generated=100000, x<=4=87345, filtered=84582, selected=70, elapsed=154.0s
+n=17: generated=150000, x<=4=134209, filtered=130964, selected=125, elapsed=305.4s
+
+Final output:
+summary n=17: generated=193900, x<=4=177228, filtered=173742, selected=168
+  greedy histogram: 9:4 10:159 11:4409 12:32024 13:68057 14:50577 15:16005 16:2339 17:164 18:4
+  exact histogram: 11:9 11..13:4 11..14:1 11..15:1 12:130 12..13:3 12..14:5 12..15:5 13:9 13..16:1
+
+Refinement:
+The 20 unresolved graph6 strings from the 500,000-node pass were rerun with
+node_budget=5,000,000.  Summary of that direct rerun:
+
+exact histogram: 11..13:1 12:8 12..14:2 13:8 13..16:1
+
+Combined interpretation:
+The selected layer consists of 168 critical-filtered order-17 graphs: 164 with
+deterministic DSATUR value 17 and 4 with deterministic DSATUR value 18.
+
+After the direct 5,000,000-node refinement:
+  exact 11: 9
+  exact 12: 138
+  exact 13: 17
+  unresolved but <= 13: 1
+  unresolved but <= 14: 2
+  unresolved but <= 16: 1
+
+Every selected graph has a certified strong coloring with at most 16 colors.
+All fully settled selected graphs have exact conflict chromatic number at most
+13.  Thus the order-17 high-greedy layer is not close to a 21-chromatic
+conflict graph.
+
+Remaining unresolved ranges after the 5,000,000-node direct pass:
+  graph6=P???C@_eChRO@sBgMOBQ?XO? exact=11..13
+  graph6=P??CAA_KFOL_QKEg?yCi?Do? exact=12..14
+  graph6=P??CAA_KDW\?EWQKIo?M_Do? exact=12..14
+  graph6=P??CA?ooHSLOIoTAPcCi?DS? exact=13..16

@@ -171,6 +171,16 @@ class ExactResult:
     clique_size: int
 
 
+@dataclass
+class CaseSummary:
+    graph6: str
+    greedy: int
+    tight_edges: int
+    profile: str
+    clique_size: int | None
+    exact_status: str | None
+
+
 def exact_chromatic_range(
     graph: list[set[int]],
     upper: int,
@@ -216,19 +226,26 @@ def report_case(
     greedy: int,
     exact: bool,
     node_budget: int,
+    emit: bool = True,
 ) -> str | None:
     tight_edges = sum(1 for x in profile if x == 4)
-    print(f"case {case_no}: graph6={line}")
-    print(f"  greedy={greedy} tight_edges={tight_edges} profile={profile_summary(profile)}")
+    if emit:
+        print(f"case {case_no}: graph6={line}", flush=True)
+        print(
+            f"  greedy={greedy} tight_edges={tight_edges} profile={profile_summary(profile)}",
+            flush=True,
+        )
     if not exact:
         return None
 
     result = exact_chromatic_range(conflicts, greedy, node_budget)
     status = str(result.upper) if result.exact else f"{result.lower}..{result.upper}"
-    print(
-        f"  clique={result.clique_size} exact={status} "
-        f"checks={' '.join(result.checks) or 'none'}"
-    )
+    if emit:
+        print(
+            f"  clique={result.clique_size} exact={status} "
+            f"checks={' '.join(result.checks) or 'none'}",
+            flush=True,
+        )
     return status
 
 
@@ -239,6 +256,7 @@ def analyze(
     exact: bool,
     node_budget: int,
     progress: int,
+    summary_only: bool,
 ) -> None:
     generated = 0
     local_survivors = 0
@@ -246,6 +264,7 @@ def analyze(
     selected = 0
     greedy_hist: collections.Counter[int] = collections.Counter()
     exact_hist: collections.Counter[str] = collections.Counter()
+    unresolved: list[CaseSummary] = []
     started = time.monotonic()
 
     for line in iter_geng_graphs(n):
@@ -275,9 +294,30 @@ def analyze(
             continue
 
         selected += 1
-        status = report_case(selected, line, profile, conflicts, greedy, exact, node_budget)
+        status = report_case(
+            selected,
+            line,
+            profile,
+            conflicts,
+            greedy,
+            exact,
+            node_budget,
+            emit=not summary_only,
+        )
         if status is not None:
             exact_hist[status] += 1
+            if ".." in status:
+                clique = maximum_clique(conflicts)
+                unresolved.append(
+                    CaseSummary(
+                        graph6=line,
+                        greedy=greedy,
+                        tight_edges=sum(1 for x in profile if x == 4),
+                        profile=profile_summary(profile),
+                        clique_size=len(clique),
+                        exact_status=status,
+                    )
+                )
 
     print(
         f"summary n={n}: generated={generated}, x<=4={local_survivors}, "
@@ -286,6 +326,13 @@ def analyze(
     print("  greedy histogram:", " ".join(f"{k}:{greedy_hist[k]}" for k in sorted(greedy_hist)))
     if exact:
         print("  exact histogram:", " ".join(f"{k}:{exact_hist[k]}" for k in sorted(exact_hist)))
+    if unresolved:
+        print("  unresolved cases:")
+        for case in unresolved:
+            print(
+                f"    graph6={case.graph6} greedy={case.greedy} clique={case.clique_size} "
+                f"exact={case.exact_status} tight_edges={case.tight_edges} profile={case.profile}"
+            )
 
 
 def analyze_graph6_inputs(lines: list[str], exact: bool, node_budget: int) -> None:
@@ -309,6 +356,7 @@ def main() -> None:
     parser.add_argument("--threshold", type=int, default=18, help="minimum greedy color count")
     parser.add_argument("--critical-filters", action="store_true")
     parser.add_argument("--exact", action="store_true", help="run exact coloring on selected cases")
+    parser.add_argument("--summary-only", action="store_true", help="suppress selected case details")
     parser.add_argument(
         "--node-budget",
         type=int,
@@ -337,6 +385,7 @@ def main() -> None:
         exact=args.exact,
         node_budget=args.node_budget,
         progress=args.progress,
+        summary_only=args.summary_only,
     )
 
 
