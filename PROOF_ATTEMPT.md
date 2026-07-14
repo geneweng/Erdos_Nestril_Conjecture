@@ -903,3 +903,51 @@ This is still not a general proof.  It does, however, give a much smaller
 search target for future computation: start directly from connected
 4-regular triangle-free graphs with `x(e) <= 4`, rather than all degree-[3,4]
 graphs.
+
+## Step 11: Exact Check of the Hardest Order-17 Greedy Cases
+
+The order-17 reduced sweep above used deterministic DSATUR as a constructive
+upper bound.  To check whether the largest greedy values reflect genuine
+chromatic difficulty, I added `analyze_reduced_extremes.py`.  It extracts
+high-greedy survivors and, for those selected graphs only, runs a dependency-
+free exact coloring check on the strong conflict graph.
+
+Run:
+
+```sh
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 18 --exact --node-budget 500000 --progress 50000
+```
+
+The scan finds exactly the four Gallai-compatible order-17 survivors whose
+deterministic greedy strong coloring uses 18 colors.  The initial bounded
+exact check gives:
+
+```text
+case 1: clique=12 exact=13
+case 2: clique=12 exact=12..15
+case 3: clique=10 exact=13
+case 4: clique=11 exact=12
+```
+
+Rerunning case 2 directly with a larger budget,
+
+```sh
+python3 analyze_reduced_extremes.py --graph6 'P??CAA_SFOJCCwL_T_?Y_@s?' --exact --node-budget 5000000
+```
+
+settles it exactly:
+
+```text
+clique=12 exact=12
+```
+
+Thus none of the four order-17 critical-filtered greedy-18 graphs is close to
+being a 21-chromatic conflict graph: their exact conflict chromatic numbers are
+`13, 12, 13, 12`.
+
+This is not a new reduction, because the remaining 164 critical-filtered
+order-17 survivors with greedy value 17 have not all been exact-checked.  It
+does show that the current worst greedy examples are heuristic artifacts, not
+near-counterexamples.  The next computational target is to exact-check the
+greedy-17 layer or to extract a structural reason that these high-greedy
+survivors recolor so far below 20.
