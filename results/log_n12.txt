@@ -1,0 +1,7 @@
+[n12_p5] done: 38560 graphs, 0 near-misses, 0 hits
+[n12_p3] done: 39673 graphs, 0 near-misses, 0 hits
+[n12_p1] done: 46160 graphs, 0 near-misses, 0 hits
+[n12_p2] done: 44114 graphs, 0 near-misses, 0 hits
+[n12_p4] done: 51519 graphs, 0 near-misses, 0 hits
+[n12_p0] done: 64149 graphs, 0 near-misses, 0 hits
+n=12 sweep complete

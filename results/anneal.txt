@@ -1,0 +1,72 @@
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/gweng/cc_projects/Erdos_Nestril_Conjecture/hunt_anneal.py", line 16, in <module>
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 14
+        ~~~^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '12 3'
+  File "/Users/gweng/cc_projects/Erdos_Nestril_Conjecture/hunt_anneal.py", line 16, in <module>
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 14
+        ~~~^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '12 1'
+Traceback (most recent call last):
+  File "/Users/gweng/cc_projects/Erdos_Nestril_Conjecture/hunt_anneal.py", line 16, in <module>
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 14
+        ~~~^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '14 3'
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/Users/gweng/cc_projects/Erdos_Nestril_Conjecture/hunt_anneal.py", line 16, in <module>
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 14
+        ~~~^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '18 7'
+  File "/Users/gweng/cc_projects/Erdos_Nestril_Conjecture/hunt_anneal.py", line 16, in <module>
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 14
+        ~~~^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '14 2'
+Traceback (most recent call last):
+  File "/Users/gweng/cc_projects/Erdos_Nestril_Conjecture/hunt_anneal.py", line 16, in <module>
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 14
+        ~~~^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '16 5'
+[n=12 seed=1] step 0: cur chi'_s=12, best=12
+[n=14 seed=2] step 0: cur chi'_s=10, best=11
+[n=14 seed=3] step 0: cur chi'_s=20, best=20
+[n=12 seed=3] step 0: cur chi'_s=20, best=20
+[n=18 seed=7] step 0: cur chi'_s=11, best=11
+[n=16 seed=5] step 0: cur chi'_s=12, best=12
+[n=12 seed=1] step 500: cur chi'_s=12, best=13
+[n=14 seed=3] step 500: cur chi'_s=13, best=20
+[n=14 seed=2] step 500: cur chi'_s=13, best=14
+[n=12 seed=3] step 500: cur chi'_s=12, best=20
+[n=12 seed=1] step 1000: cur chi'_s=12, best=13
+[n=16 seed=5] step 500: cur chi'_s=13, best=13
+[n=12 seed=3] step 1000: cur chi'_s=16, best=20
+[n=18 seed=7] step 500: cur chi'_s=12, best=12
+[n=12 seed=1] step 1500: cur chi'_s=15, best=15
+[n=12 seed=3] step 1500: cur chi'_s=16, best=20
+[n=16 seed=5] step 1000: cur chi'_s=14, best=14
+[n=12 seed=1] step 2000: cur chi'_s=15, best=15
+[n=12 seed=3] step 2000: cur chi'_s=16, best=20
+[n=18 seed=7] step 1000: cur chi'_s=12, best=12
+[n=12 seed=1] step 2500: cur chi'_s=17, best=17
+[n=16 seed=5] step 1500: cur chi'_s=15, best=15
+[n=14 seed=2] step 1000: cur chi'_s=13, best=14
+[n=12 seed=3] step 2500: cur chi'_s=16, best=20
+[n=12 seed=1] FINAL best chi'_s=17  KDy@GxA?HgOX
+[n=14 seed=3] step 1000: cur chi'_s=14, best=20
+[n=12 seed=3] FINAL best chi'_s=20  K]KoWZBoo???
+[n=14 seed=2] step 1500: cur chi'_s=16, best=16
+[n=16 seed=5] step 2000: cur chi'_s=15, best=15
+[n=18 seed=7] step 1500: cur chi'_s=15, best=15
+[n=14 seed=2] step 2000: cur chi'_s=16, best=16
+[n=16 seed=5] step 2500: cur chi'_s=15, best=15
+[n=14 seed=2] step 2500: cur chi'_s=16, best=16
+[n=18 seed=7] step 2000: cur chi'_s=15, best=15
+[n=16 seed=5] FINAL best chi'_s=15  O_OiCCRL?CPKACK?o_H_D
+[n=14 seed=2] FINAL best chi'_s=16  MGPRCaOAd?`pJCcW?
+[n=18 seed=7] step 2500: cur chi'_s=15, best=15
+[n=18 seed=7] FINAL best chi'_s=15  QAWCOI``SOG??D@PEP?HEGa@OCG
+[n=14 seed=3] step 1500: cur chi'_s=14, best=20
+[n=14 seed=3] step 2000: cur chi'_s=14, best=20
+[n=14 seed=3] step 2500: cur chi'_s=14, best=20
+[n=14 seed=3] FINAL best chi'_s=20  M]KoWZBoo????????

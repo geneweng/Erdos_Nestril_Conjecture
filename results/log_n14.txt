@@ -1,0 +1,11 @@
+[n14_p8] done: 2932429 graphs, 0 near-misses, 0 hits
+[n14_p1] done: 3233009 graphs, 0 near-misses, 0 hits
+[n14_p9] done: 3488757 graphs, 0 near-misses, 0 hits
+[n14_p5] done: 3457036 graphs, 0 near-misses, 0 hits
+[n14_p2] done: 3455330 graphs, 0 near-misses, 0 hits
+[n14_p4] done: 3568916 graphs, 0 near-misses, 0 hits
+[n14_p0] done: 3678897 graphs, 0 near-misses, 0 hits
+[n14_p6] done: 4090622 graphs, 0 near-misses, 0 hits
+[n14_p3] done: 4210988 graphs, 0 near-misses, 0 hits
+[n14_p7] done: 4685561 graphs, 0 near-misses, 0 hits
+n=14 sweep complete
