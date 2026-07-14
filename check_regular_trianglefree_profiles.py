@@ -6,7 +6,9 @@ with nauty `geng`, computes
     x(uv) = e(N(u) \\ {v}, N(v) \\ {u}),
 
 and reports which graphs survive the necessary criticality condition x(e) <= 4
-for every edge.
+for every edge.  It also checks two additional necessary conditions for the
+conflict graph of a 21-critical counterexample: the Kostochka-Yancey edge
+density lower bound and Gallai's theorem on the tight-edge subgraph.
 
 It is not a coloring proof.  It is a quick way to see which local 4-cycle
 profiles remain after the reductions in PROOF_ATTEMPT.md.
@@ -56,6 +58,21 @@ def edge_x_profile(adj: list[set[int]]) -> tuple[tuple[int, ...], list[tuple[int
     return tuple(sorted(values)), edge_data
 
 
+def edges_conflict(adj: list[set[int]], e: tuple[int, int], f: tuple[int, int]) -> bool:
+    a, b = e
+    c, d = f
+    return (
+        a == c
+        or a == d
+        or b == c
+        or b == d
+        or c in adj[a]
+        or d in adj[a]
+        or c in adj[b]
+        or d in adj[b]
+    )
+
+
 def has_tight_star(adj: list[set[int]], edge_x: dict[tuple[int, int], int]) -> bool:
     for v, nbrs in enumerate(adj):
         if all(edge_x[tuple(sorted((v, w)))] == 4 for w in nbrs):
@@ -81,6 +98,78 @@ def has_tight_4cycle(adj: list[set[int]], edge_x: dict[tuple[int, int], int]) ->
     return False
 
 
+def block_is_clique(block: set[int], graph: list[set[int]]) -> bool:
+    size = len(block)
+    return all(len(graph[v] & block) == size - 1 for v in block)
+
+
+def block_is_odd_cycle(block: set[int], graph: list[set[int]]) -> bool:
+    size = len(block)
+    if size < 3 or size % 2 == 0:
+        return False
+    return all(len(graph[v] & block) == 2 for v in block)
+
+
+def biconnected_blocks(graph: list[set[int]]) -> list[set[int]]:
+    n = len(graph)
+    disc = [-1] * n
+    low = [0] * n
+    edge_stack: list[tuple[int, int]] = []
+    blocks: list[set[int]] = []
+    time = 0
+
+    def dfs(v: int, parent: int) -> None:
+        nonlocal time
+        disc[v] = low[v] = time
+        time += 1
+        for w in graph[v]:
+            if disc[w] == -1:
+                edge_stack.append((v, w))
+                dfs(w, v)
+                low[v] = min(low[v], low[w])
+                if low[w] >= disc[v]:
+                    block = set()
+                    while True:
+                        a, b = edge_stack.pop()
+                        block.add(a)
+                        block.add(b)
+                        if (a, b) == (v, w):
+                            break
+                    blocks.append(block)
+            elif w != parent and disc[w] < disc[v]:
+                edge_stack.append((v, w))
+                low[v] = min(low[v], disc[w])
+
+    for v in range(n):
+        if disc[v] == -1:
+            dfs(v, -1)
+    return blocks
+
+
+def tight_conflict_gallai_ok(adj: list[set[int]], edge_data: list[tuple[int, int, int]]) -> bool:
+    tight_edges = [(u, v) for u, v, x in edge_data if x == 4]
+    graph = [set() for _ in tight_edges]
+    for i, edge in enumerate(tight_edges):
+        for j in range(i + 1, len(tight_edges)):
+            if edges_conflict(adj, edge, tight_edges[j]):
+                graph[i].add(j)
+                graph[j].add(i)
+
+    for block in biconnected_blocks(graph):
+        if len(block) <= 2:
+            continue
+        if not (block_is_clique(block, graph) or block_is_odd_cycle(block, graph)):
+            return False
+    return True
+
+
+def ky_min_degree_sum(conflict_vertices: int, colors: int = 21) -> int:
+    """Kostochka-Yancey lower bound on degree sum of a k-critical graph."""
+    numerator = (colors + 1) * (colors - 2) * conflict_vertices - colors * (colors - 3)
+    denominator = colors - 1
+    return (numerator + denominator - 1) // denominator
+
+
 def summarize(n: int) -> None:
     proc = subprocess.run(
         ["geng", "-c", "-t", "-q", "-d4", "-D4", str(n), f"{2 * n}:{2 * n}"],
@@ -94,6 +183,10 @@ def summarize(n: int) -> None:
     tight_stars = 0
     tight_4cycles = 0
     tight_star_or_4cycle = 0
+    ky_compatible = 0
+    tight_gallai_compatible = 0
+    conflict_vertices = 2 * n
+    min_degree_sum = ky_min_degree_sum(conflict_vertices)
 
     for line in proc.stdout.splitlines():
         if not line:
@@ -104,6 +197,11 @@ def summarize(n: int) -> None:
         if max(profile, default=0) > 4:
             continue
         survivors += 1
+        conflict_degree_sum = sum(24 - x for x in profile)
+        if conflict_degree_sum >= min_degree_sum:
+            ky_compatible += 1
+        if tight_conflict_gallai_ok(adj, edge_data):
+            tight_gallai_compatible += 1
         profiles[profile] += 1
         edge_x = {tuple(sorted((u, v))): x for u, v, x in edge_data}
         has_star = has_tight_star(adj, edge_x)
@@ -113,6 +211,8 @@ def summarize(n: int) -> None:
         tight_star_or_4cycle += int(has_star or has_4cycle)
 
     print(f"n={n}: generated={generated}, x<=4 survivors={survivors}")
+    print(f"  KY-compatible survivors: {ky_compatible}")
+    print(f"  tight-edge Gallai-compatible survivors: {tight_gallai_compatible}")
     print(f"  survivors with tight star: {tight_stars}")
     print(f"  survivors with tight 4-cycle: {tight_4cycles}")
     print(f"  survivors with tight star or tight 4-cycle: {tight_star_or_4cycle}")

@@ -754,7 +754,12 @@ remaining case may avoid tight edges entirely.
 To test whether the tight-star/tight-4-cycle target is forced by the remaining
 local assumptions, I added `check_regular_trianglefree_profiles.py`.  It uses
 `geng` to enumerate connected 4-regular triangle-free graphs, parses graph6
-directly, and computes the profile of `x(e)` values.
+directly, and computes the profile of `x(e)` values.  It also checks two
+critical-graph constraints on the associated conflict graph:
+
+1. the Kostochka-Yancey lower bound on the edge density of a 21-critical
+   graph, and
+2. Gallai's theorem applied to the subgraph induced by tight edges.
 
 The script filters only by the necessary local criticality condition
 
@@ -776,24 +781,35 @@ Output from this pass:
 
 ```text
 n=10: generated=2, x<=4 survivors=0
+  KY-compatible survivors: 0
+  tight-edge Gallai-compatible survivors: 0
 n=12: generated=12, x<=4 survivors=4
+  KY-compatible survivors: 4
+  tight-edge Gallai-compatible survivors: 1
   survivors with tight star: 0
   survivors with tight 4-cycle: 2
   survivors with tight star or tight 4-cycle: 2
 n=14: generated=220, x<=4 survivors=160
+  KY-compatible survivors: 160
+  tight-edge Gallai-compatible survivors: 112
   survivors with tight star: 9
   survivors with tight 4-cycle: 25
   survivors with tight star or tight 4-cycle: 26
 n=16: generated=16828, x<=4 survivors=14784
+  KY-compatible survivors: 14784
+  tight-edge Gallai-compatible survivors: 14102
   survivors with tight star: 258
   survivors with tight 4-cycle: 1389
   survivors with tight star or tight 4-cycle: 1411
 ```
 
-Thus most locally surviving small graphs have neither a tight star nor a
-tight 4-cycle.  The tight-`K4` list-extension obstruction from Step 8 is useful
-when such a configuration exists, but it is not forced by the current
-reductions.
+The Kostochka-Yancey density bound does not remove any of these locally
+surviving small graphs.  Gallai's tight-edge condition does remove some:
+3 of 4 survivors at order 12, 48 of 160 at order 14, and 682 of 14,784 at
+order 16.  However, many Gallai-compatible survivors remain, and most locally
+surviving small graphs still have neither a tight star nor a tight 4-cycle.
+The tight-`K4` list-extension obstruction from Step 8 is useful when such a
+configuration exists, but it is not forced by the current reductions.
 
 This pushes the next target toward non-tight deletions.  For a deleted star or
 4-cycle with edge values `x_1,...,x_4`, the available lists have lower bounds
