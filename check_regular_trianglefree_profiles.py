@@ -17,9 +17,34 @@ profiles remain after the reductions in PROOF_ATTEMPT.md.
 from __future__ import annotations
 
 import collections
+from collections.abc import Iterator
 import itertools
 import subprocess
 import sys
+
+
+def iter_geng_graphs(n: int) -> Iterator[str]:
+    """Yield graph6 lines for connected 4-regular triangle-free graphs."""
+    cmd = ["geng", "-c", "-t", "-q", "-d4", "-D4", str(n), f"{2 * n}:{2 * n}"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
+    assert proc.stdout is not None
+    try:
+        for line in proc.stdout:
+            line = line.strip()
+            if line:
+                yield line
+        ret = proc.wait()
+        if ret != 0:
+            raise subprocess.CalledProcessError(ret, cmd)
+    except BaseException:
+        if proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+        raise
 
 
 def parse_graph6(line: str) -> list[set[int]]:
@@ -171,12 +196,6 @@ def ky_min_degree_sum(conflict_vertices: int, colors: int = 21) -> int:
 
 
 def summarize(n: int) -> None:
-    proc = subprocess.run(
-        ["geng", "-c", "-t", "-q", "-d4", "-D4", str(n), f"{2 * n}:{2 * n}"],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
     generated = 0
     survivors = 0
     profiles: collections.Counter[tuple[int, ...]] = collections.Counter()
@@ -188,9 +207,7 @@ def summarize(n: int) -> None:
     conflict_vertices = 2 * n
     min_degree_sum = ky_min_degree_sum(conflict_vertices)
 
-    for line in proc.stdout.splitlines():
-        if not line:
-            continue
+    for line in iter_geng_graphs(n):
         generated += 1
         adj = parse_graph6(line)
         profile, edge_data = edge_x_profile(adj)

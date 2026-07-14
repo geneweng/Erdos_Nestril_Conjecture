@@ -1,0 +1,21 @@
+Reduced sweep after the proof-attempt reductions
+Date: 2026-07-14
+
+Command:
+python3 check_reduced_small_orders.py --progress 50000 17
+
+Progress:
+n=17: generated=50000, survivors=41948, max_greedy=17, elapsed=35.0s
+n=17: generated=100000, survivors=87345, max_greedy=18, elapsed=76.3s
+n=17: generated=150000, survivors=134209, max_greedy=18, elapsed=131.8s
+
+Final output:
+n=17: generated=193900, x<=4 survivors=177228, max greedy strong colors=18
+  histogram: 9:4 10:159 11:4418 12:32311 13:69157 14:51870 15:16647 16:2477 17:180 18:5
+
+Interpretation:
+After Theorems 12 and 13 in PROOF_ATTEMPT.md, a connected edge-critical
+counterexample must be 4-regular, triangle-free, and satisfy x(e) <= 4 on
+every edge.  Every graph in that reduced order-17 family has a deterministic
+DSATUR strong coloring using at most 18 colors, so no order-17 graph in the
+reduced family is a counterexample.

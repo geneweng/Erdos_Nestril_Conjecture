@@ -817,7 +817,7 @@ This pushes the next target toward non-tight deletions.  For a deleted star or
 more than Hall's theorem from list sizes alone.  It must exploit the precise
 overlap pattern of the colored conflict neighborhoods.
 
-## Step 10: Reduced Exhaustion for 15 and 16 Vertices
+## Step 10: Reduced Exhaustion for 15 Through 17 Vertices
 
 The structural reductions also make the next small-order exhaustive checks
 much cheaper.
@@ -837,7 +837,7 @@ family using `geng`, then greedily colors the strong conflict graph.  A greedy
 coloring with at most 20 colors is a constructive certificate that the graph is
 not a counterexample.
 
-Run:
+Run for the first two orders beyond the original exhaustive theorem:
 
 ```sh
 python3 check_reduced_small_orders.py
@@ -852,10 +852,24 @@ n=16: generated=16828, x<=4 survivors=14784, max greedy strong colors=18
   histogram: 8:1 9:1 10:27 11:410 12:2919 13:5547 14:4060 15:1456 16:321 17:39 18:3
 ```
 
+The script now streams `geng` output and accepts a progress interval.  This
+allowed the next order to be checked without buffering all generated graphs:
+
+```sh
+python3 check_reduced_small_orders.py --progress 50000 17
+```
+
+Final output:
+
+```text
+n=17: generated=193900, x<=4 survivors=177228, max greedy strong colors=18
+  histogram: 9:4 10:159 11:4418 12:32311 13:69157 14:51870 15:16647 16:2477 17:180 18:5
+```
+
 Therefore, conditional only on the reductions proved above, there is no
-counterexample on 15 or 16 vertices.  Combined with the original exhaustive
+counterexample on 15, 16, or 17 vertices.  Combined with the original exhaustive
 search through 14 vertices, the current proof/computation package rules out
-counterexamples on at most 16 vertices.
+counterexamples on at most 17 vertices.
 
 This is still not a general proof.  It does, however, give a much smaller
 search target for future computation: start directly from connected
