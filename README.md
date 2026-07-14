@@ -1,8 +1,9 @@
 # Erdős–Nešetřil Conjecture: Computational Attack at Δ = 4
 
 **Conjecture (Erdős–Nešetřil, 1985).** The edges of any simple graph with maximum
-degree Δ can be partitioned into at most 1.25 Δ² induced matchings — equivalently,
-the *strong chromatic index* satisfies χ′ₛ(G) ≤ 1.25 Δ².
+degree Δ can be partitioned into at most 1.25 Δ² induced matchings when Δ is even
+(with a slightly sharper odd-Δ formula) — equivalently, for even Δ the
+*strong chromatic index* satisfies χ′ₛ(G) ≤ 1.25 Δ².
 
 Proved for Δ ≤ 3; **open for Δ ≥ 4**. At Δ = 4 the conjectured bound is **20**
 and the best proven upper bound is **21** (Huang–Santana–Yu 2018), so a
@@ -18,6 +19,9 @@ results. Full write-ups:
 * [PROOF_NOTES.md](PROOF_NOTES.md) — toward a proof: critical-graph lemmas with
   complete proofs, the two computer-assisted theorems, and an assessment of
   what a full proof would take.
+* [PROOF_ATTEMPT.md](PROOF_ATTEMPT.md) — latest proof attempt: Gallai-forest
+  constraints on tight edges and a Hall-extension obstruction around any
+  degree-3 vertex.
 
 Highlights:
 
@@ -29,8 +33,9 @@ Highlights:
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
   strictly above clique number.
 * Structured families (circulants, torus grids, line graphs of cubic graphs,
-  cycle blowups — 747 graphs) and simulated annealing all stay at χ′ₛ ≤ 17;
-  the C₅ blowup (20) is an isolated peak: every mutation collapses it.
+  cycle blowups — 747 graphs) stay below the bound except for the C₅ blowup
+  itself; random-start annealing stays at χ′ₛ ≤ 17, while seeded C₅-blowup
+  runs remain at the isolated peak 20 and every mutation collapses it.
 * **Critical-graph structure theory** (proved): a minimal counterexample has
   min degree 3, its degree-3 vertices pairwise at distance ≥ 3 with rigid
   tree-like 13-vertex second neighborhoods, every edge in at most one
@@ -73,11 +78,12 @@ brew install nauty          # for geng (exhaustive generation)
 | `hunt_sweep.py` + `run_sweep.sh` | Exhaustive sweep: `./run_sweep.sh <n> <maxedges> <workers>` enumerates all connected graphs with degrees in [3,4] and ≥ 21 edges via `geng`, flags any χ′ₛ ≥ 21. |
 | `hunt_strongclique.py` | SAT search for a 21-edge strong clique at Δ = 4 (`python hunt_strongclique.py <n> [target]`). |
 | `hunt_strongclique_d.py` | Same, generalized: `python hunt_strongclique_d.py <D> <target> [N]`. |
-| `hunt_structured.py` / `hunt_structured2.py` / `hunt_circulants.py` | Structured families: circulants, torus grids, line graphs of cubic graphs, odd-cycle blowups. |
+| `hunt_structured.py` / `hunt_structured2.py` / `hunt_circulants.py` / `hunt_bounded.py` | Structured families: circulants, torus grids, line graphs of cubic graphs, odd-cycle blowups, and bounded-effort large family sweeps. |
 | `hunt_anneal.py` | Simulated annealing over Δ ≤ 4 graphs: `python hunt_anneal.py <n> <seed> <steps>`. |
 | `test_crosscheck.py` | Validation: SAT-based χ′ₛ vs. brute-force backtracking on 60 random graphs. |
-| `results/` | Logs from all runs. |
+| `results/` | Selected committed logs and search outputs. |
 | `REPORT.md` | Full write-up: methods, pruning lemmas, results, interpretation. |
+| `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Proof notes and the latest partial proof attempt. |
 
 ## Reproducing the headline results
 
