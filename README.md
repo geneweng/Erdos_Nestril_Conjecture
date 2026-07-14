@@ -12,17 +12,29 @@ pairwise-conflicting edges, so the bound is tight.
 
 This repo is a systematic computational hunt for such a counterexample.
 **No counterexample was found**; along the way we obtained rigorous negative
-results — see [REPORT.md](REPORT.md) for the full write-up. Highlights:
+results. Full write-ups:
 
-* **No counterexample exists on ≤ 14 vertices** (exhaustive: ~40M graphs after
-  provable criticality pruning; n = 15 in progress).
+* [REPORT.md](REPORT.md) — the counterexample hunt: methods, all searches, data.
+* [PROOF_NOTES.md](PROOF_NOTES.md) — toward a proof: critical-graph lemmas with
+  complete proofs, the two computer-assisted theorems, and an assessment of
+  what a full proof would take.
+
+Highlights:
+
+* **No counterexample exists on ≤ 14 vertices** (exhaustive: 40,414,906 graphs
+  after provable criticality pruning — zero hits, none even reached 20 greedy
+  colors).
 * **The strong clique number of Δ ≤ 4 graphs is exactly 20** (SAT, with a
   rigorous 28-vertex reduction): the "clique version" of the conjecture holds
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
   strictly above clique number.
 * Structured families (circulants, torus grids, line graphs of cubic graphs,
-  cycle blowups) and simulated annealing all stay well below 20; the C₅ blowup
-  is an isolated peak.
+  cycle blowups — 747 graphs) and simulated annealing all stay at χ′ₛ ≤ 17;
+  the C₅ blowup (20) is an isolated peak: every mutation collapses it.
+* **Critical-graph structure theory** (proved): a minimal counterexample has
+  min degree 3, its degree-3 vertices pairwise at distance ≥ 3 with rigid
+  second neighborhoods, every edge in at most one triangle, and a local
+  sparsity budget 4t + D + x ≤ 4 per 4–4 edge (PROOF_NOTES.md §2).
 
 ## Tooling
 

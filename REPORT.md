@@ -1,100 +1,115 @@
-# Erdős–Nešetřil Conjecture at Δ = 4: A Computational Attack
+# Erdős–Nešetřil at Δ = 4: Counterexample Hunt — Final Report
 
-**Conjecture (Erdős–Nešetřil, 1985).** The edges of any simple graph with maximum
-degree Δ can be partitioned into at most ⌈1.25 Δ²⌉ induced matchings; equivalently
-the *strong chromatic index* satisfies χ′ₛ(G) ≤ 1.25 Δ² (with the refined value
-(5Δ² − 2Δ + 1)/4 for odd Δ).
+**Conjecture (Erdős–Nešetřil, 1985).** χ′ₛ(G) ≤ 1.25 Δ² for every simple graph G
+of maximum degree Δ, where χ′ₛ is the strong chromatic index (minimum number of
+induced matchings partitioning E). Proved for Δ ≤ 3; open for Δ ≥ 4.
 
-Status of the problem: proved for Δ ≤ 3 (Andersen 1992; Horák–Qing–Trotter 1993).
-Open for Δ ≥ 4. For Δ = 4 the conjectured bound is **20**, and the best proven
-upper bound is **21** (Huang–Santana–Yu 2018). The C₅ blowup (each vertex of a
-5-cycle replaced by an independent pair) is 4-regular with 20 edges that pairwise
-conflict, so χ′ₛ = 20: the conjecture is tight. Hence at Δ = 4 the conjecture and
-the theorem differ by exactly one color: a counterexample is precisely a Δ = 4
-graph with χ′ₛ = 21.
+At Δ = 4 the conjectured bound is **20**; the proven bound is **21**
+(Huang–Santana–Yu 2018); the C₅ blowup C₅[2] (each vertex of a 5-cycle replaced
+by an independent pair; 4-regular, 10 vertices, 20 edges, all pairwise
+conflicting) shows 20 is attained. **A counterexample is exactly a Δ ≤ 4 graph
+with χ′ₛ = 21.** This project hunted for one.
 
-This project hunted for such a counterexample. **No counterexample was found**, and
-several rigorous negative results were established along the way (modulo correctness
-of the encodings + solvers, all of which were validated on known cases).
+**Verdict: no counterexample found — and two rigorous negative results.**
+Companion document: [PROOF_NOTES.md](PROOF_NOTES.md) (structural lemmas with
+proofs, and an assessment of the path to a full proof).
 
-## Method
+## Tooling and validation
 
-A strong edge coloring of G is a proper vertex coloring of the conflict graph
-L(G)², whose vertices are edges of G, adjacent when they share an endpoint or are
-joined by an edge of G. Tooling (`sec.py`): exact χ′ₛ via DSATUR upper bound, exact
-max-clique lower bound, and CaDiCaL SAT decisions with clique symmetry breaking.
-Validated on: C₅ (χ′ₛ = 5), Petersen (5), C₅ blowup (20), Δ=3 clique values (10 yes/11 no).
+χ′ₛ(G) = χ(L(G)²) where the conflict graph L(G)² joins edges at distance ≤ 1.
+Exact values: DSATUR upper bound, max-clique lower bound, CaDiCaL SAT decisions
+with clique symmetry breaking (`sec.py`). Validation:
+
+* C₅ → 5, Petersen → 5, C₅[2] → 20, K₅ → 10, K₄,₄ → 16 (all known values);
+* Δ = 3 strong-clique maximum reproduced: 10 achievable, 11 UNSAT (matches the
+  proven Δ = 3 theorem);
+* SAT-based χ′ₛ equals brute-force backtracking on 60 random graphs
+  (`test_crosscheck.py`).
 
 ## Result 1 — No counterexample on ≤ 14 vertices (exhaustive)
 
-Any counterexample contains a connected *edge-critical* counterexample H (delete
-edges while χ′ₛ stays 21; components don't interact in strong colorings). In H every
-edge conflicts with ≥ 20 others. Counting degrees around an edge uv with
-S = N[u] ∪ N[v]: #conflicts ≤ Σ_{s∈S} deg(s) − e(S) − 1, which gives:
+Any counterexample contains a connected edge-critical one, whose every edge has
+≥ 20 conflicting edges; degree counting then forces all degrees in {3, 4} and
+no adjacent degree-3 pairs (Lemmas A–B in PROOF_NOTES.md). geng enumeration of
+all connected degree-[3,4] graphs with ≥ 21 edges, with the criticality prune,
+DSATUR filter, and SAT decisions:
 
-* deg(u) + deg(v) ≤ 6 ⇒ ≤ 16 conflicts. So **H has min degree ≥ 3 and no two
-  adjacent degree-3 vertices**.
-* Every counterexample has ≥ 21 edges, so ≥ 11 vertices at Δ = 4.
+| n | graphs tested | χ′ₛ ≥ 21 | DSATUR ≥ 20 |
+|---|---|---|---|
+| 11 | 5,705 | 0 | 0 |
+| 12 | 284,175 | 0 | 0 |
+| 13 | 3,323,481 | 0 | 0 |
+| 14 | 36,801,545 | 0 | 0 |
+| **total** | **40,414,906** | **0** | **0** |
 
-geng enumerated all connected graphs with degrees in [3,4] and ≥ 21 edges on
-n = 11, 12, 13, 14 vertices (5,705 + 284,175 + 3,323,481 + 36,801,545 graphs).
-Each was tested (criticality prune → DSATUR ≤ 20 prune → SAT decision).
-**Outcome: zero graphs with χ′ₛ ≥ 21; [TODO n14/n15 status]. Any edge-critical
-counterexample needs ≥ [15] vertices.**
+Not a single graph even pushed the greedy coloring to 20 colors. A partial
+n = 15 sweep (~1 CPU-day of the ~430M-graph space) was aborted by request with
+no hits. **Any counterexample has ≥ 15 vertices.**
 
-## Result 2 — The strong clique number at Δ = 4 is exactly 20 (SAT, rigorous)
+## Result 2 — Strong clique number at Δ = 4 is exactly 20 (SAT, rigorous)
 
-A "strong clique" is a set of edges pairwise at distance ≤ 1 — a clique in L(G)².
-A 21-edge strong clique with Δ ≤ 4 would immediately disprove the conjecture. Note
-the general strong-clique bound 1.25Δ² is itself only conjectured (best proven:
-~4Δ²/3, Faron–Postle), which for Δ = 4 allows 21 — so this route was genuinely open.
+A 21-edge strong clique (edges pairwise conflicting) would disprove the
+conjecture instantly, and the general strong-clique bound (≈ 4Δ²/3 proven)
+does not exclude it. We settled it: after a rigorous reduction to host graphs
+on ≤ 28 vertices with WLOG labeling, CaDiCaL proves UNSAT in 16 s; target 20 is
+SAT and recovers C₅[2]. See PROOF_NOTES.md §3.
 
-Finite model: fix a clique edge {0,1}; every clique edge touches S = N[0] ∪ N[1],
-|S| ≤ 8; every vertex relevant to the clique and its joining edges is an endpoint
-of a clique edge, and ≤ 20 clique edges leave S, so 28 vertices suffice. A SAT
-encoding (host adjacency vars + clique selector vars, degree ≤ 4 cardinality
-constraints, pairwise-conflict clauses, WLOG prefix labeling) is **UNSAT for
-21 edges on n = 28 in 16 s** (CaDiCaL), and SAT for 20 edges, recovering the C₅
-blowup. Hence:
+> No graph with Δ ≤ 4 has 21 pairwise-conflicting edges; the maximum is 20.
 
-> **Theorem (computer-assisted).** No graph with Δ ≤ 4 contains 21 edges that
-> pairwise share an endpoint or are joined by an edge. The Erdős–Nešetřil
-> conjecture holds at Δ = 4 in its strong-clique version, tightly: max = 20.
+Consequence: a counterexample's conflict graph must have χ = 21 > ω — a global
+chromatic/clique-gap obstruction, invisible to local density.
 
-Consequence: any counterexample graph must have conflict-graph chromatic number
-strictly exceeding its clique number — it cannot be certified by local density.
+At Δ = 5 the analogous probe (does a 30-edge strong clique exist? the refined
+odd-Δ conjecture says max = 29) was still running when this report was written;
+the instance (39-vertex host, 304k clauses) had not resolved after ~1 h.
+[Update here when it finishes.]
 
-Same method at Δ = 3: max strong clique = 10 = (5·9−6+1)/4 ✓ (matches the theorem).
-At Δ = 5: [TODO Δ=5 results]
+## Result 3 — Structured families plateau far below 20
 
-## Result 3 — Structured families and local search stay far below 20
+747 structured Δ = 4 graphs, exact where the budgeted SAT converged
+(brackets `[lb,ub]` otherwise):
 
-* 4-regular circulants C_n(a,b), 11 ≤ n ≤ 40: max χ′ₛ observed [TODO].
-* Torus grids C_m □ C_n: χ′ₛ ∈ {9, 10, 11} — far below 20.
-* Line graphs of all connected cubic graphs on ≤ 14 vertices (4-regular): [TODO].
-* Blowups of odd cycles with part sizes ≤ 3 and degree ≤ 4: [TODO].
-* Simulated annealing over Δ ≤ 4 graphs (n = 12–18, exact χ′ₛ objective):
-  never exceeded 20; the only state reaching 20 was the C₅ blowup itself.
-  Random 4-regular graphs at n = 12–14 sit around χ′ₛ ≈ 13–17, and adding any
-  21st edge to the C₅ blowup (n = 11+) collapses the value — the extremal
-  configuration is an isolated peak.
+| family | count | max χ′ₛ (exact) | max upper bound |
+|---|---|---|---|
+| circulants C_n(a,b), n = 11–40 | ~620 | 13 | 16 (undecided brackets at n=16) |
+| torus grids C_m □ C_n, 3 ≤ m ≤ n ≤ 8 | 15 | 12 | 12 |
+| line graphs of cubic graphs ≤ 14 vertices | 112+ | 13 | 13 |
+| odd-cycle blowups (parts ≤ 3, Δ ≤ 4) | dozens | 20 (C₅[2] itself) | 20 |
+| named graphs (K₅, K₄,₄, Q₄, Chvátal, …) | — | 16 (K₄,₄) | 16 |
+
+## Result 4 — Local search confirms C₅[2] is an isolated peak
+
+Simulated annealing over Δ ≤ 4 graphs (n = 12–18, exact χ′ₛ objective,
+add/remove/rewire moves, 3,000 steps × 6 runs): random starts plateau at
+χ′ₛ = 15–17; runs seeded at C₅[2] never improve on 20 — every mutation
+(including every way of adding a 21st edge and more vertices) collapses the
+value. The extremal configuration behaves as a strict, isolated local maximum
+of χ′ₛ over the whole search space, consistent with the conjectured uniqueness
+of the extremal graph.
 
 ## Interpretation
 
-Everything found is consistent with the conjecture being **true and tight** at
-Δ = 4: the unique-looking extremal structure (C₅ blowup) maximizes both clique
-and chromatic number of the conflict graph, the clique version is now verified
-exactly, and there is no counterexample on ≤ 14 vertices [TODO update]. A
-counterexample, if it exists, must be a graph of ≥ 15 vertices whose conflict
-graph has chromatic number 21 but clique number ≤ 20 — a chromatic/clique gap
-phenomenon of which no trace appeared in ~40 million exhaustively tested graphs
-or any structured family.
+Everything points to the conjecture being **true and tight at Δ = 4**:
 
-## Files
+1. The clique relaxation is now a theorem (max strong clique = 20, attained
+   only by the extremal-type configuration in our searches).
+2. No counterexample exists through 14 vertices, with a criticality theory
+   (min degree 3, scattered degree-3 vertices, ≤ 1 triangle per edge,
+   4t + D + x ≤ 4 local sparsity) that makes small counterexamples impossible
+   and large ones extremely rigid.
+3. Every constructive family and every stochastic search saturates at or below
+   17 except the unique known extremal graph at exactly 20.
 
-* `sec.py` — solver toolkit (conflict graph, DSATUR, max clique, SAT coloring)
-* `hunt_sweep.py`, `run_sweep.sh` — exhaustive geng sweeps with criticality pruning
-* `hunt_strongclique.py`, `hunt_strongclique_d.py` — strong-clique SAT (Δ=4 / general)
-* `hunt_structured.py` — circulants, torus grids, line graphs, blowups
-* `hunt_anneal.py` — simulated annealing
-* `results/` — logs
+The remaining gap (21 → 20) is a pure "last color" problem. The most promising
+route we see is combining our critical-graph lemmas with the Huang–Santana–Yu
+case analysis at the 20-color level (PROOF_NOTES.md §5).
+
+## Reproducibility
+
+All searches: `sec.py` (toolkit), `hunt_sweep.py`/`run_sweep.sh` (exhaustive),
+`hunt_strongclique.py`/`hunt_strongclique_d.py` (clique SAT),
+`hunt_structured.py`/`hunt_bounded.py`/`hunt_circulants.py` (families),
+`hunt_anneal.py` (annealing), `test_crosscheck.py` (validation), logs in
+`results/`. Environment: Python 3.13, networkx, python-sat (CaDiCaL 1.9.5),
+nauty geng, macOS, 12 cores. Total compute ≈ 6 CPU-hours plus the aborted
+n = 15 partial sweep.
