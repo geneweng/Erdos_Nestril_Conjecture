@@ -21,7 +21,8 @@ results. Full write-ups:
   what a full proof would take.
 * [PROOF_ATTEMPT.md](PROOF_ATTEMPT.md) — latest proof attempt: Gallai-forest
   constraints, Hall/recoloring obstructions, and a computer-assisted
-  elimination of degree-3 vertices in any critical counterexample.
+  elimination of degree-3 vertices; any remaining critical counterexample is
+  reduced to the 4-regular triangle-free case.
 
 Highlights:
 

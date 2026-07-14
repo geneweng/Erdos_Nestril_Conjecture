@@ -542,3 +542,119 @@ This completes the first major target identified in `PROOF_NOTES.md`: the
 degree-3 case is eliminated.  The remaining hypothetical counterexample is
 4-regular, edge-critical, has conflict graph chromatic number 21 and clique
 number at most 20, and every edge satisfies the local budget `4t + x <= 4`.
+
+## Step 7: Eliminating Triangles in the 4-Regular Case
+
+Now assume `H` is a 4-regular connected edge-critical counterexample.
+
+For any edge `uv`, the 4-regular count is:
+
+```text
+conflicts(uv) = 24 - 4t - x,
+```
+
+where `t = |N(u) cap N(v)|` and `x` is the number of extra internal edges in
+`S(uv)` beyond the seven star edges.  Since every edge has at least 20
+conflicts, `4t + x <= 4`.  In particular, every edge lies in at most one
+triangle.  If an edge lies in a triangle, then `t = 1` and `x = 0`, so that
+edge is tight.
+
+We prove that no triangle can occur.
+
+Let `abc` be a triangle.  Since every triangle edge is tight, each of
+`ab,bc,ca` has exactly 20 conflicts.  Write:
+
+```text
+A = N(a) \ {b,c},    B = N(b) \ {a,c},    C = N(c) \ {a,b}.
+```
+
+Each of `A,B,C` has size 2.  The condition `x = 0` for the three triangle
+edges implies:
+
+* each of `A,B,C` is independent;
+* there are no edges between any two of `A,B,C`;
+* vertices in `A` are not adjacent to `b` or `c`, vertices in `B` are not
+  adjacent to `a` or `c`, and vertices in `C` are not adjacent to `a` or `b`.
+
+Let:
+
+```text
+L   = the six edges from {a,b,c} to A union B union C,
+O_A = the six edges incident with A other than the two edges from a,
+O_B = the six edges incident with B other than the two edges from b,
+O_C = the six edges incident with C other than the two edges from c.
+```
+
+### Hall Obstruction for the Deleted Triangle
+
+Delete the three triangle edges.  This graph is 20-strong-colorable, by
+edge-criticality and restriction from a coloring of `H - ab`.  In any such
+20-coloring, let `A_ab,A_bc,A_ca` be the available color sets for the missing
+edges `ab,bc,ca`.
+
+Each missing triangle edge has exactly 18 colored conflicts, because it had
+20 conflicts in `H` and the other two triangle edges have been deleted.  Hence
+each available set has size at least 2.  The three missing edges pairwise
+conflict, so if the coloring did not extend to `H`, Hall's theorem forces:
+
+```text
+A_ab = A_bc = A_ca = R,
+```
+
+where `R` is a common 2-color set.
+
+For the missing edge `ab`, the 18 colored conflicts are exactly:
+
+```text
+L union O_A union O_B.
+```
+
+Similarly the conflict sets for `ac` and `bc` are:
+
+```text
+L union O_A union O_C,
+L union O_B union O_C.
+```
+
+Since each missing edge has exactly the same two missing colors `R`, each of
+these three 18-edge sets must use the same 18 colors, namely all colors outside
+`R`, with no repetition.
+
+Let `P` be the six colors used on `L`, and let
+
+```text
+S_A = colors on O_A,
+S_B = colors on O_B,
+S_C = colors on O_C.
+```
+
+Then each `S_*` has size 6, and the common complement of `P union R` is a
+12-color set `Q`.  The three displayed conflict sets force:
+
+```text
+S_A union S_B = Q,
+S_A union S_C = Q,
+S_B union S_C = Q,
+```
+
+and in each union the two sets are disjoint, because the corresponding
+18-edge conflict set is rainbow.
+
+The first two equations give `S_B = Q \ S_A = S_C`.  But the third equation
+requires `S_B` and `S_C` to be disjoint 6-sets.  This is impossible.
+
+Therefore a 4-regular connected edge-critical counterexample is triangle-free.
+
+**Theorem 13.** Every connected edge-critical counterexample at `Delta = 4`,
+if one exists, is 4-regular and triangle-free.
+
+In the remaining case every edge has `t = 0`, so for each edge:
+
+```text
+conflicts(e) = 24 - x(e),        0 <= x(e) <= 4.
+```
+
+An edge is tight exactly when `x(e) = 4`.  The next target is to use the same
+delete-and-extend method on a non-triangular edge, where the obstruction is no
+longer a 3-edge clique but a single missing edge whose 20 available blockers
+must saturate the local budget.
