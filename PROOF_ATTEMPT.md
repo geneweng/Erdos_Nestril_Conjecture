@@ -979,7 +979,31 @@ unresolved but <= 16: 1
 
 In particular every high-greedy order-17 survivor has a certified 16-color
 strong coloring, and all fully settled cases have exact value at most 13.
+
+I also added a structural summary mode:
+
+```sh
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 --structure --summary-only --progress 50000
+```
+
+For the same 168 selected graphs it reports:
+
+```text
+clique histogram: 10:22 11:62 12:83 13:1
+alpha histogram: 3:105 4:63
+ceil(n/alpha) histogram: 9:63 12:105
+degree range histogram: 20..23:26 20..24:122 21..23:4 21..24:14 22..22:1 22..23:1
+```
+
+Here `alpha` is the maximum independent-set size in the conflict graph,
+equivalently the largest induced matching in the original graph.  Since the
+order-17 graphs have 34 edges, the 105 cases with `alpha = 3` already have the
+basic lower bound `ceil(34/3) = 12`, matching the most common exact value.
+The selected conflict graphs remain dense, with minimum conflict degree at
+least 20, but their clique numbers are at most 13 and their exact chromatic
+numbers are far below the 21-critical threshold.
+
 This is still not a structural proof, but it shows that the current worst
 greedy examples are very far from 21-chromatic conflict graphs.  The next
-computational target is to extract a common recoloring/degeneracy mechanism
-explaining why these high-greedy survivors collapse so far below 20.
+computational target is to extract a common recoloring or induced-matching
+mechanism explaining why these high-greedy survivors collapse so far below 20.

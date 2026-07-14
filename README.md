@@ -94,7 +94,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `check_degree3_cross_edges.py` | Dependency-free finite check used in `PROOF_ATTEMPT.md` to eliminate cross edges around a degree-3 vertex. |
 | `check_regular_trianglefree_profiles.py` | Dependency-free `geng`-based profiler for the remaining 4-regular triangle-free local case, including KY density, Gallai tight-edge filters, and `--progress` for larger orders. |
 | `check_reduced_small_orders.py` | Reduced exhaustive check after the proof-attempt reductions; defaults to 15 and 16 vertices and supports `--progress` plus `--critical-filters` for larger orders. |
-| `analyze_reduced_extremes.py` | Extracts high-greedy reduced survivors and optionally exact-colors their conflict graphs with a dependency-free bounded DSATUR backtracker; supports direct `--graph6` checks and `--summary-only`. |
+| `analyze_reduced_extremes.py` | Extracts high-greedy reduced survivors and optionally exact-colors their conflict graphs with a dependency-free bounded DSATUR backtracker; supports direct `--graph6` checks, `--summary-only`, and `--structure`. |
 
 ## Reproducing the headline results
 

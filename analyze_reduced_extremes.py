@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import collections
 from dataclasses import dataclass
+import math
 import sys
 import time
 
@@ -84,6 +85,36 @@ def maximum_clique(graph: list[set[int]]) -> list[int]:
 
     expand([], all_vertices, 0)
     return best
+
+
+def complement_graph(graph: list[set[int]]) -> list[set[int]]:
+    n = len(graph)
+    vertices = set(range(n))
+    return [vertices - {v} - graph[v] for v in range(n)]
+
+
+@dataclass
+class StructureSummary:
+    clique: int
+    alpha: int
+    color_lb: int
+    min_degree: int
+    max_degree: int
+    degree_sum: int
+
+
+def structure_summary(graph: list[set[int]]) -> StructureSummary:
+    clique = len(maximum_clique(graph))
+    alpha = len(maximum_clique(complement_graph(graph)))
+    degrees = [len(nbrs) for nbrs in graph]
+    return StructureSummary(
+        clique=clique,
+        alpha=alpha,
+        color_lb=math.ceil(len(graph) / alpha),
+        min_degree=min(degrees, default=0),
+        max_degree=max(degrees, default=0),
+        degree_sum=sum(degrees),
+    )
 
 
 @dataclass
@@ -226,8 +257,9 @@ def report_case(
     greedy: int,
     exact: bool,
     node_budget: int,
+    structure: bool,
     emit: bool = True,
-) -> str | None:
+) -> tuple[str | None, StructureSummary | None]:
     tight_edges = sum(1 for x in profile if x == 4)
     if emit:
         print(f"case {case_no}: graph6={line}", flush=True)
@@ -235,8 +267,18 @@ def report_case(
             f"  greedy={greedy} tight_edges={tight_edges} profile={profile_summary(profile)}",
             flush=True,
         )
+
+    struct = structure_summary(conflicts) if structure else None
+    if emit and struct is not None:
+        print(
+            f"  omega={struct.clique} alpha={struct.alpha} "
+            f"ceil(n/alpha)={struct.color_lb} "
+            f"conflict_degree={struct.min_degree}..{struct.max_degree} "
+            f"degree_sum={struct.degree_sum}",
+            flush=True,
+        )
     if not exact:
-        return None
+        return None, struct
 
     result = exact_chromatic_range(conflicts, greedy, node_budget)
     status = str(result.upper) if result.exact else f"{result.lower}..{result.upper}"
@@ -246,7 +288,7 @@ def report_case(
             f"checks={' '.join(result.checks) or 'none'}",
             flush=True,
         )
-    return status
+    return status, struct
 
 
 def analyze(
@@ -257,6 +299,7 @@ def analyze(
     node_budget: int,
     progress: int,
     summary_only: bool,
+    structure: bool,
 ) -> None:
     generated = 0
     local_survivors = 0
@@ -264,6 +307,10 @@ def analyze(
     selected = 0
     greedy_hist: collections.Counter[int] = collections.Counter()
     exact_hist: collections.Counter[str] = collections.Counter()
+    clique_hist: collections.Counter[int] = collections.Counter()
+    alpha_hist: collections.Counter[int] = collections.Counter()
+    color_lb_hist: collections.Counter[int] = collections.Counter()
+    degree_range_hist: collections.Counter[tuple[int, int]] = collections.Counter()
     unresolved: list[CaseSummary] = []
     started = time.monotonic()
 
@@ -294,7 +341,7 @@ def analyze(
             continue
 
         selected += 1
-        status = report_case(
+        status, struct = report_case(
             selected,
             line,
             profile,
@@ -302,8 +349,14 @@ def analyze(
             greedy,
             exact,
             node_budget,
+            structure,
             emit=not summary_only,
         )
+        if struct is not None:
+            clique_hist[struct.clique] += 1
+            alpha_hist[struct.alpha] += 1
+            color_lb_hist[struct.color_lb] += 1
+            degree_range_hist[(struct.min_degree, struct.max_degree)] += 1
         if status is not None:
             exact_hist[status] += 1
             if ".." in status:
@@ -326,6 +379,20 @@ def analyze(
     print("  greedy histogram:", " ".join(f"{k}:{greedy_hist[k]}" for k in sorted(greedy_hist)))
     if exact:
         print("  exact histogram:", " ".join(f"{k}:{exact_hist[k]}" for k in sorted(exact_hist)))
+    if structure:
+        print("  clique histogram:", " ".join(f"{k}:{clique_hist[k]}" for k in sorted(clique_hist)))
+        print("  alpha histogram:", " ".join(f"{k}:{alpha_hist[k]}" for k in sorted(alpha_hist)))
+        print(
+            "  ceil(n/alpha) histogram:",
+            " ".join(f"{k}:{color_lb_hist[k]}" for k in sorted(color_lb_hist)),
+        )
+        print(
+            "  degree range histogram:",
+            " ".join(
+                f"{lo}..{hi}:{degree_range_hist[(lo, hi)]}"
+                for lo, hi in sorted(degree_range_hist)
+            ),
+        )
     if unresolved:
         print("  unresolved cases:")
         for case in unresolved:
@@ -335,14 +402,19 @@ def analyze(
             )
 
 
-def analyze_graph6_inputs(lines: list[str], exact: bool, node_budget: int) -> None:
+def analyze_graph6_inputs(
+    lines: list[str],
+    exact: bool,
+    node_budget: int,
+    structure: bool,
+) -> None:
     exact_hist: collections.Counter[str] = collections.Counter()
     for index, line in enumerate(lines, start=1):
         adj = parse_graph6(line)
         profile, _ = edge_x_profile(adj)
         conflicts = conflict_graph(adj)
         greedy = dsatur_greedy(conflicts)
-        status = report_case(index, line, profile, conflicts, greedy, exact, node_budget)
+        status, _ = report_case(index, line, profile, conflicts, greedy, exact, node_budget, structure)
         if status is not None:
             exact_hist[status] += 1
     if exact:
@@ -356,6 +428,7 @@ def main() -> None:
     parser.add_argument("--threshold", type=int, default=18, help="minimum greedy color count")
     parser.add_argument("--critical-filters", action="store_true")
     parser.add_argument("--exact", action="store_true", help="run exact coloring on selected cases")
+    parser.add_argument("--structure", action="store_true", help="report clique/independence summaries")
     parser.add_argument("--summary-only", action="store_true", help="suppress selected case details")
     parser.add_argument(
         "--node-budget",
@@ -373,7 +446,12 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.graph6:
-        analyze_graph6_inputs(args.graph6, exact=args.exact, node_budget=args.node_budget)
+        analyze_graph6_inputs(
+            args.graph6,
+            exact=args.exact,
+            node_budget=args.node_budget,
+            structure=args.structure,
+        )
         return
     if args.order is None:
         parser.error("order is required unless --graph6 is supplied")
@@ -386,6 +464,7 @@ def main() -> None:
         node_budget=args.node_budget,
         progress=args.progress,
         summary_only=args.summary_only,
+        structure=args.structure,
     )
 
 
