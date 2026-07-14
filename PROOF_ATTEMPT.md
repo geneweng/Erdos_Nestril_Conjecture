@@ -6,15 +6,17 @@ Goal: prove that every simple graph with maximum degree at most 4 has strong
 chromatic index at most 20.
 
 Status: no complete proof yet.  The main progress here is that a connected
-edge-critical counterexample is shown to be 4-regular: degree-3 vertices are
-eliminated using the local Hall/recoloring obstruction plus a finite
-cross-edge check.  The main tools below are:
+edge-critical counterexample is reduced to the 4-regular triangle-free case:
+degree-3 vertices are eliminated using the local Hall/recoloring obstruction
+plus a finite cross-edge check, and triangles are eliminated by a palette
+argument.  The main tools below are:
 
 1. a Gallai-forest constraint on the edges with exactly 20 conflicts, and
 2. a Hall-extension obstruction obtained by deleting a degree-3 vertex,
 3. a one-edge recoloring saturation lemma for the radius-2 ball, and
 4. a dependency-free finite check ruling out cross edges between the three
-   arms around a degree-3 vertex.
+   arms around a degree-3 vertex, and
+5. a triangle-deletion palette contradiction in the 4-regular case.
 
 These are intended to extend the reductions already recorded in
 `PROOF_NOTES.md`.
@@ -28,7 +30,7 @@ These are intended to extend the reductions already recorded in
 5. If that succeeds, attack the remaining 4-regular case.
 
 The pass below completes Steps 1--4 and reduces the remaining problem to the
-4-regular case.
+4-regular triangle-free case.
 
 ## Step 1: Critical Setup
 
@@ -658,3 +660,91 @@ An edge is tight exactly when `x(e) = 4`.  The next target is to use the same
 delete-and-extend method on a non-triangular edge, where the obstruction is no
 longer a 3-edge clique but a single missing edge whose 20 available blockers
 must saturate the local budget.
+
+## Step 8: The Remaining 4-Regular Triangle-Free Obstruction
+
+This step records the exact shape of the remaining problem after Theorem 13.
+It does not close the conjecture, but it identifies the next local targets
+without hiding the obstruction.
+
+Let `uv` be an edge in the remaining graph.  Write:
+
+```text
+A = N(u) \ {v},       B = N(v) \ {u}.
+```
+
+Since the graph is triangle-free, `A` and `B` are independent 3-sets.  The
+extra internal edges in `S(uv)` are exactly the edges between `A` and `B`.
+Thus:
+
+```text
+x(uv) = e(A,B) = the number of 4-cycles containing uv,
+conflicts(uv) = 24 - x(uv),
+0 <= x(uv) <= 4.
+```
+
+So a tight edge is exactly an edge in four 4-cycles.
+
+### Single-Edge Deletion
+
+In every 20-coloring of `H - uv`, the conflict neighborhood of `uv` must use
+all 20 colors; otherwise the coloring extends to `uv`.  Since this
+neighborhood has `24 - x(uv)` edges, the number of surplus color occurrences
+is:
+
+```text
+(24 - x(uv)) - 20 = 4 - x(uv).
+```
+
+Consequently:
+
+* if `x(uv) = 4`, the 20 conflicting edges are rainbow, recovering the frozen
+  tight-edge lemma;
+* if `x(uv) = 3`, exactly one color is repeated among the 21 conflicts;
+* if `x(uv) = 0`, four repetitions are possible among the 24 conflicts.
+
+This explains why non-tight edges are harder than the deleted degree-3 star or
+triangle cases: the local color obstruction has room for repetitions.
+
+### Deleting a Star or a 4-Cycle
+
+Two natural four-edge deletions remain:
+
+1. the four edges incident with a vertex, and
+2. the four edges of a 4-cycle.
+
+In either case the deleted edges form a `K4` in the conflict graph.  Let the
+deleted set be `F`, and let `x_e = x(e)` for `e in F`.  In any 20-coloring of
+`H - F`, the available color list `L_e` for a missing edge `e` has size at
+least:
+
+```text
+|L_e| >= max(0, x_e - 1).
+```
+
+Reason: `e` has `24 - x_e` conflicts in `H`, and the other three edges of
+`F` all conflict with `e` and have been deleted, leaving at most
+`21 - x_e` colored conflicts.
+
+If the four lists `{L_e : e in F}` have a system of distinct representatives,
+then the coloring extends over the deleted `K4`.  Therefore, in a critical
+counterexample, every 20-coloring of `H - F` must make these four lists fail
+Hall's condition.
+
+The most rigid special case is when all four deleted edges are tight
+(`x_e = 4`).  Then all four lists have size at least 3.  Four lists of size at
+least 3 can fail Hall only in one way:
+
+```text
+L_e = R for all e in F,
+```
+
+for a common 3-color set `R`.  Equivalently, for every tight-star or tight-4-
+cycle deletion, the 17 colored conflicts of each deleted edge must be rainbow
+and must use the same 17 colors.
+
+This is the next sharp target.  A contradiction here would either eliminate
+vertices incident only with tight edges or eliminate 4-cycles whose four edges
+are tight.  The present local analysis does not yet force such a configuration:
+graphs like the C5 blowup have `x(e) = 1` on every edge, showing that the
+remaining case may avoid tight edges entirely.

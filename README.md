@@ -22,7 +22,8 @@ results. Full write-ups:
 * [PROOF_ATTEMPT.md](PROOF_ATTEMPT.md) — latest proof attempt: Gallai-forest
   constraints, Hall/recoloring obstructions, and a computer-assisted
   elimination of degree-3 vertices; any remaining critical counterexample is
-  reduced to the 4-regular triangle-free case.
+  reduced to the 4-regular triangle-free case, with the remaining local
+  obstruction stated as a tight `K4` list-extension problem.
 
 Highlights:
 
