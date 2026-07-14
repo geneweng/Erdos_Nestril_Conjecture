@@ -9,6 +9,9 @@ chosen threshold.
 For the selected graphs it can also run a small exact coloring check on the
 strong conflict graph.  The exact checker is dependency-free and intended for
 the few high-greedy survivors, not for full-family exact coloring.
+
+It can also color selected cases by repeatedly removing a maximum induced
+matching, giving a constructive packing heuristic to compare with DSATUR.
 """
 
 from __future__ import annotations
@@ -116,6 +119,16 @@ def complement_graph(graph: list[set[int]]) -> list[set[int]]:
     n = len(graph)
     vertices = set(range(n))
     return [vertices - {v} - graph[v] for v in range(n)]
+
+
+def induced_subgraph(graph: list[set[int]], vertices: list[int]) -> list[set[int]]:
+    index = {v: i for i, v in enumerate(vertices)}
+    subgraph = [set() for _ in vertices]
+    for v in vertices:
+        for w in graph[v]:
+            if w in index:
+                subgraph[index[v]].add(index[w])
+    return subgraph
 
 
 @dataclass
@@ -275,6 +288,25 @@ def color_class_summary(coloring: list[int]) -> str:
     return " ".join(f"size={size}:{size_hist[size]}" for size in sorted(size_hist))
 
 
+def class_size_summary(classes: list[list[int]]) -> str:
+    size_hist = collections.Counter(len(cls) for cls in classes)
+    return " ".join(f"size={size}:{size_hist[size]}" for size in sorted(size_hist))
+
+
+def maximum_induced_matching_pack(graph: list[set[int]]) -> list[list[int]]:
+    """Color by repeatedly removing a maximum independent set."""
+    remaining = list(range(len(graph)))
+    classes: list[list[int]] = []
+    while remaining:
+        subgraph = induced_subgraph(graph, remaining)
+        independent_set = maximum_clique(complement_graph(subgraph))
+        color_class = [remaining[i] for i in independent_set]
+        classes.append(color_class)
+        used = set(color_class)
+        remaining = [v for v in remaining if v not in used]
+    return classes
+
+
 def color_class_details(
     adj: list[set[int]],
     edge_data: list[tuple[int, int, int]],
@@ -320,8 +352,9 @@ def report_case(
     structure: bool,
     witness: bool,
     witness_details: bool,
+    pack: bool,
     emit: bool = True,
-) -> tuple[str | None, StructureSummary | None]:
+) -> tuple[str | None, StructureSummary | None, int | None]:
     tight_edges = sum(1 for x in profile if x == 4)
     if emit:
         print(f"case {case_no}: graph6={line}", flush=True)
@@ -340,7 +373,17 @@ def report_case(
             flush=True,
         )
     if not exact:
-        return None, struct
+        pack_colors = None
+        if pack:
+            packed_classes = maximum_induced_matching_pack(conflicts)
+            pack_colors = len(packed_classes)
+            if emit:
+                print(
+                    f"  pack_colors={pack_colors} "
+                    f"pack_classes={class_size_summary(packed_classes)}",
+                    flush=True,
+                )
+        return None, struct, pack_colors
 
     result = exact_chromatic_range(conflicts, greedy, node_budget)
     status = str(result.upper) if result.exact else f"{result.lower}..{result.upper}"
@@ -356,7 +399,17 @@ def report_case(
                 print("  color_class_details:", flush=True)
                 for detail_line in color_class_details(adj, edge_data, result.coloring):
                     print(detail_line, flush=True)
-    return status, struct
+    pack_colors = None
+    if pack:
+        packed_classes = maximum_induced_matching_pack(conflicts)
+        pack_colors = len(packed_classes)
+        if emit:
+            print(
+                f"  pack_colors={pack_colors} "
+                f"pack_classes={class_size_summary(packed_classes)}",
+                flush=True,
+            )
+    return status, struct, pack_colors
 
 
 def analyze(
@@ -370,6 +423,7 @@ def analyze(
     structure: bool,
     witness: bool,
     witness_details: bool,
+    pack: bool,
 ) -> None:
     generated = 0
     local_survivors = 0
@@ -381,6 +435,7 @@ def analyze(
     alpha_hist: collections.Counter[int] = collections.Counter()
     color_lb_hist: collections.Counter[int] = collections.Counter()
     degree_range_hist: collections.Counter[tuple[int, int]] = collections.Counter()
+    pack_hist: collections.Counter[int] = collections.Counter()
     unresolved: list[CaseSummary] = []
     started = time.monotonic()
 
@@ -411,7 +466,7 @@ def analyze(
             continue
 
         selected += 1
-        status, struct = report_case(
+        status, struct, pack_colors = report_case(
             selected,
             line,
             adj,
@@ -424,8 +479,11 @@ def analyze(
             structure,
             witness,
             witness_details,
+            pack,
             emit=not summary_only,
         )
+        if pack_colors is not None:
+            pack_hist[pack_colors] += 1
         if struct is not None:
             clique_hist[struct.clique] += 1
             alpha_hist[struct.alpha] += 1
@@ -467,6 +525,8 @@ def analyze(
                 for lo, hi in sorted(degree_range_hist)
             ),
         )
+    if pack:
+        print("  pack histogram:", " ".join(f"{k}:{pack_hist[k]}" for k in sorted(pack_hist)))
     if unresolved:
         print("  unresolved cases:")
         for case in unresolved:
@@ -483,6 +543,7 @@ def analyze_graph6_inputs(
     structure: bool,
     witness: bool,
     witness_details: bool,
+    pack: bool,
 ) -> None:
     exact_hist: collections.Counter[str] = collections.Counter()
     for index, line in enumerate(lines, start=1):
@@ -490,7 +551,7 @@ def analyze_graph6_inputs(
         profile, edge_data = edge_x_profile(adj)
         conflicts = conflict_graph(adj)
         greedy = dsatur_greedy(conflicts)
-        status, _ = report_case(
+        status, _, _ = report_case(
             index,
             line,
             adj,
@@ -503,6 +564,7 @@ def analyze_graph6_inputs(
             structure,
             witness,
             witness_details,
+            pack,
         )
         if status is not None:
             exact_hist[status] += 1
@@ -520,6 +582,7 @@ def main() -> None:
     parser.add_argument("--structure", action="store_true", help="report clique/independence summaries")
     parser.add_argument("--witness", action="store_true", help="print exact coloring class-size histograms")
     parser.add_argument("--witness-details", action="store_true", help="print edge-level color classes")
+    parser.add_argument("--pack", action="store_true", help="color by repeatedly removing maximum induced matchings")
     parser.add_argument("--summary-only", action="store_true", help="suppress selected case details")
     parser.add_argument(
         "--node-budget",
@@ -549,6 +612,7 @@ def main() -> None:
             structure=args.structure,
             witness=args.witness,
             witness_details=args.witness_details,
+            pack=args.pack,
         )
         return
     if args.order is None:
@@ -565,6 +629,7 @@ def main() -> None:
         structure=args.structure,
         witness=args.witness,
         witness_details=args.witness_details,
+        pack=args.pack,
     )
 
 

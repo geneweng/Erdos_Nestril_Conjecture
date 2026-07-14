@@ -1043,6 +1043,27 @@ So the useful phenomenon is not a special tight-edge decomposition.  It is the
 existence of many medium-size induced matchings even inside dense conflict
 graphs with minimum degree at least 20.
 
+To test whether this phenomenon can be made algorithmic, I added a packing
+mode that repeatedly removes a maximum independent set of the conflict graph,
+equivalently a maximum induced matching of the original graph:
+
+```sh
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 --pack --summary-only --progress 50000
+```
+
+For the same 168 high-greedy order-17 cases, this simple induced-matching
+packing gives:
+
+```text
+pack histogram: 12:19 13:76 14:65 15:8
+```
+
+Thus all high-greedy order-17 survivors are colored with at most 15 colors by
+a direct maximum-induced-matching packing heuristic, without exact coloring
+backtracking.  This is weaker than the best exact values, but it is a more
+structural certificate: repeatedly finding large induced matchings already
+overcomes the deterministic DSATUR artifacts.
+
 This is still not a structural proof, but it shows that the current worst
 greedy examples are very far from 21-chromatic conflict graphs.  The next
 computational target is to extract a common recoloring or induced-matching

@@ -1,0 +1,22 @@
+Maximum-induced-matching packing of the order-17 high-greedy layer
+Date: 2026-07-14
+
+Command:
+python3 analyze_reduced_extremes.py 17 --critical-filters --threshold 17 --pack --summary-only --progress 50000
+
+Progress:
+n=17: generated=50000, x<=4=41948, filtered=40194, selected=31, elapsed=38.5s
+n=17: generated=100000, x<=4=87345, filtered=84582, selected=70, elapsed=84.4s
+n=17: generated=150000, x<=4=134209, filtered=130964, selected=125, elapsed=142.2s
+
+Final output:
+summary n=17: generated=193900, x<=4=177228, filtered=173742, selected=168
+  greedy histogram: 9:4 10:159 11:4409 12:32024 13:68057 14:50577 15:16005 16:2339 17:164 18:4
+  pack histogram: 12:19 13:76 14:65 15:8
+
+Interpretation:
+The selected layer consists of the 168 critical-filtered order-17 graphs whose
+deterministic DSATUR strong coloring uses at least 17 colors.  Repeatedly
+removing a maximum induced matching colors all of them with at most 15 colors.
+This is not always exact, but it is a direct constructive explanation for why
+the high-greedy cases are far from the 21-color threshold.
