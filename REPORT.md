@@ -18,11 +18,12 @@ conflicting) shows 20 is attained. **A counterexample is exactly a Δ ≤ 4 grap
 with χ′ₛ = 21.** This project hunted for one.
 
 **Verdict after correction: no counterexample found in the searches performed,
-and one rigorous negative result remains central.**  The SAT proof that the
-strong clique number at `Delta = 4` is exactly 20 is unaffected.  The earlier
-proof-certified small-order exclusion relied on withdrawn pruning and is now
-only historical/conditional evidence.  Companion correction:
-[ERRATA.md](ERRATA.md).
+and two rigorous post-erratum results are recorded.**  The SAT proof that the
+strong clique number at `Delta = 4` is exactly 20 is unaffected, and the
+corrected conflict-core sweep verifies the conjecture through 12 vertices.  The
+earlier proof-certified exclusion through 14 vertices relied on withdrawn
+pruning and is now only historical/conditional evidence.  Companion correction:
+[ERRATA.md](ERRATA.md), replacement framework: [CONFLICT_CORE.md](CONFLICT_CORE.md).
 
 ## Tooling and validation
 
@@ -79,6 +80,26 @@ odd-Δ conjecture says max = 29) was still running when this report was written;
 the instance (39-vertex host, 304k clauses) had not resolved after ~1 h.
 [Update here when it finishes.]
 
+## Result 2.5 — Corrected conflict-core sweep through 12 vertices
+
+The corrected post-erratum filter works in the fixed conflict graph
+`C = L(G)^2`.  If the 20-core of `C` is 20-colorable, then `C` is
+20-colorable by greedily extending the coloring through the core-deletion
+order.  This gives a sound replacement for the withdrawn edge-critical prune.
+
+The unpruned connected sweeps are:
+
+```text
+n=11: graphs=5,705, empty 20-core=5,705, hits=0
+n=12: graphs=1,032,644, empty 20-core=1,032,640,
+      nonempty cores=4, max core greedy colors=12, hits=0
+```
+
+Together with the trivial edge-count bound for at most 10 vertices, this
+verifies the conjecture for all graphs on at most 12 vertices.  See
+[CONFLICT_CORE.md](CONFLICT_CORE.md) and
+`results/conflict_core_sweeps_n11_n12.txt`.
+
 ## Result 3 — Structured families plateau far below 20
 
 747 structured Δ = 4 graphs, exact where the budgeted SAT converged
@@ -109,10 +130,12 @@ Delta = 4**, but the proof interpretation is weaker after the erratum:
 
 1. The clique relaxation is now a theorem (max strong clique = 20, attained
    only by the extremal-type configuration in our searches).
-2. The small-order and reduced-family searches found no counterexample in the
+2. The corrected conflict-core sweep verifies the conjecture through 12
+   vertices without edge-deletion criticality.
+3. The small-order and reduced-family searches found no counterexample in the
    families tested, but the proof that those families contain all
    counterexamples through a given order is withdrawn.
-3. Every constructive family and every stochastic search saturates at or below
+4. Every constructive family and every stochastic search saturates at or below
    17 except the unique known extremal graph at exactly 20.
 
 The remaining gap (21 → 20) is a pure "last color" problem. The most promising
@@ -122,10 +145,10 @@ Huang–Santana–Yu case analysis at the 20-color level.
 
 ## Reproducibility
 
-All searches: `sec.py` (toolkit), `hunt_sweep.py`/`run_sweep.sh` (exhaustive),
+All searches: `sec.py` (optional-dependency toolkit),
+`hunt_sweep.py`/`run_sweep.sh` (sound conflict-core sweep),
 `hunt_strongclique.py`/`hunt_strongclique_d.py` (clique SAT),
 `hunt_structured.py`/`hunt_bounded.py`/`hunt_circulants.py` (families),
 `hunt_anneal.py` (annealing), `test_crosscheck.py` (validation), logs in
-`results/`. Environment: Python 3.13, networkx, python-sat (CaDiCaL 1.9.5),
-nauty geng, macOS, 12 cores. Total compute ≈ 6 CPU-hours plus the aborted
-n = 15 partial sweep.
+`results/`. Environment: Python 3.13 and nauty geng for the corrected core
+sweep; networkx and python-sat are needed for the older exact/SAT scripts.

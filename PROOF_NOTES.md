@@ -249,15 +249,20 @@ After the erratum, the honest route forward is:
 4. Rebuild any Hall/list-extension step as an extension of a coloring of
    `C0 - X`, not as a strong coloring of `G - X`.
 
+The first concrete replacement is recorded in [CONFLICT_CORE.md](CONFLICT_CORE.md):
+any counterexample must have a non-20-colorable 20-core in its fixed conflict
+graph.  The corrected core sweep verifies the conjecture through 12 vertices.
+
 The HSY proof of the 21-color bound remains the natural comparison point, but
 the local reductions in Sections 1--2 must first be rebuilt in this
 conflict-critical language.
 
 ## 6. Conclusion
 
-The conjecture at Δ = 4 survived the computational searches performed here,
-but after the erratum only the clique relaxation is a rigorous theorem recorded
-in this file.  The heuristic signals remain favorable: the isolation of the
+The conjecture at Δ = 4 survived the computational searches performed here.
+After the erratum, the rigorous results recorded in this repository are the
+clique relaxation and the corrected conflict-core verification through 12
+vertices.  The heuristic signals remain favorable: the isolation of the
 C₅-blowup peak, the collapse of χ′ₛ under local perturbation, and structured
 families plateauing below 20.  The proof gap is still a global chromatic/clique
 gap problem, but future arguments must use conflict-critical induced subgraphs

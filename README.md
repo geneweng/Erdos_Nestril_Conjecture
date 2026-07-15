@@ -26,6 +26,8 @@ pruning, are withdrawn. See [ERRATA.md](ERRATA.md).
 Full write-ups:
 
 * [ERRATA.md](ERRATA.md) — current correction and replacement proof framework.
+* [CONFLICT_CORE.md](CONFLICT_CORE.md) — sound post-erratum core framework and
+  corrected small-order sweeps through 12 vertices.
 * [REPORT.md](REPORT.md) — historical counterexample-hunt report; read together
   with the erratum.
 * [PROOF_NOTES.md](PROOF_NOTES.md) — archival proof notes; the edge-critical
@@ -39,6 +41,10 @@ Highlights:
   rigorous 28-vertex reduction): the "clique version" of the conjecture holds
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
   strictly above clique number.
+* **The conjecture is soundly verified through 12 vertices** using the fixed
+  conflict graph's 20-core, with no edge-deletion criticality assumption.  The
+  corrected unpruned sweeps cover 5,705 graphs at order 11 and 1,032,644 graphs
+  at order 12.
 * Exact coloring computations on explicitly generated graphs remain valid; the
   reduced 4-regular triangle-free sweeps through order 17 are retained as
   exploratory evidence, not as proof-certified exclusions.
@@ -81,8 +87,8 @@ brew install nauty          # for geng (exhaustive generation)
 
 | File | Purpose |
 |---|---|
-| `sec.py` | Core toolkit: conflict graph, DSATUR/clique bounds, SAT coloring, exact χ′ₛ. Run directly for sanity checks. |
-| `hunt_sweep.py` + `run_sweep.sh` | Exhaustive sweep: `./run_sweep.sh <n> <maxedges> <workers>` enumerates all connected graphs with degrees in [3,4] and ≥ 21 edges via `geng`, flags any χ′ₛ ≥ 21. |
+| `sec.py` | Core toolkit: conflict graph, DSATUR/clique bounds, SAT coloring, exact χ′ₛ. Run directly for sanity checks when optional dependencies are installed. |
+| `hunt_sweep.py` + `run_sweep.sh` | Sound post-erratum sweep: enumerates connected graphs with `Delta <= 4` and ≥ 21 edges via `geng`, then certifies by the fixed conflict graph's 20-core. |
 | `hunt_strongclique.py` | SAT search for a 21-edge strong clique at Δ = 4 (`python hunt_strongclique.py <n> [target]`). |
 | `hunt_strongclique_d.py` | Same, generalized: `python hunt_strongclique_d.py <D> <target> [N]`. |
 | `hunt_structured.py` / `hunt_structured2.py` / `hunt_circulants.py` / `hunt_bounded.py` | Structured families: circulants, torus grids, line graphs of cubic graphs, odd-cycle blowups, and bounded-effort large family sweeps. |
@@ -90,6 +96,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `test_crosscheck.py` | Validation: SAT-based χ′ₛ vs. brute-force backtracking on 60 random graphs. |
 | `results/` | Selected committed logs and search outputs. |
 | `ERRATA.md` | Current correction: edge-critical deletion is invalid for strong coloring; replacement conflict-critical framework. |
+| `CONFLICT_CORE.md` | Sound post-erratum conflict-core lemma and corrected small-order sweeps through 12 vertices. |
 | `REPORT.md` | Historical write-up: methods, searches, and interpretation; read with `ERRATA.md`. |
 | `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Archival proof notes; edge-critical deletion arguments are withdrawn. |
 | `check_degree3_cross_edges.py` | Dependency-free finite check from the withdrawn degree-3 proof attempt; retained as conditional/exploratory tooling. |
@@ -106,6 +113,13 @@ brew install nauty          # for geng (exhaustive generation)
 .venv/bin/python hunt_strongclique_d.py 3 11   # UNSAT: matches known Δ=3 value
 ```
 
-Historical/conditional reduced sweeps can still be reproduced from
-`run_sweep.sh`, `check_reduced_small_orders.py`, and
-`analyze_reduced_extremes.py`, but they should be read with [ERRATA.md](ERRATA.md).
+Historical/conditional reduced-family sweeps can still be reproduced from
+`check_reduced_small_orders.py` and `analyze_reduced_extremes.py`, but they
+should be read with [ERRATA.md](ERRATA.md).
+
+Corrected small-order sweep:
+
+```sh
+geng -c -q -D4 11 21:22 | python3 hunt_sweep.py core_n11
+geng -c -q -D4 12 21:24 | python3 hunt_sweep.py core_n12
+```

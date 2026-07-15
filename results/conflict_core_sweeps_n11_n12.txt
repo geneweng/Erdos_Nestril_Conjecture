@@ -1,0 +1,52 @@
+Corrected conflict-core sweeps after the edge-deletion erratum
+Date: 2026-07-15
+
+These sweeps use the fixed conflict graph C = L(G)^2.  They do not use the
+withdrawn edge-critical deletion prune.  For each generated graph, the checker
+computes the 20-core K of C.  If K is empty or 20-colorable, then C is
+20-colorable by greedy extension through the core-deletion order.
+
+Order 11 command:
+geng -c -q -D4 11 21:22 | python3 hunt_sweep.py core_n11 --progress 10000
+
+Order 11 output:
+[core_n11] done: graphs=5705, empty_core=5705, greedy_core_ok=0, exact_core_ok=0, undecided=0, hits=0, max_core_size=0, max_core_greedy=0
+[core_n11] core_size_hist 0:5705
+[core_n11] core_greedy_hist
+
+Order 12 command:
+geng -c -q -D4 12 21:24 | python3 hunt_sweep.py core_n12 --progress 100000
+
+Order 12 progress:
+[core_n12] seen=100000 empty_core=99999 greedy_ok=0 exact_ok=0 undecided=0 hits=0 elapsed=8.2s
+[core_n12] seen=200000 empty_core=199999 greedy_ok=0 exact_ok=0 undecided=0 hits=0 elapsed=16.4s
+[core_n12] seen=300000 empty_core=299998 greedy_ok=1 exact_ok=0 undecided=0 hits=0 elapsed=24.7s
+[core_n12] seen=400000 empty_core=399997 greedy_ok=2 exact_ok=0 undecided=0 hits=0 elapsed=33.4s
+[core_n12] seen=500000 empty_core=499997 greedy_ok=2 exact_ok=0 undecided=0 hits=0 elapsed=41.8s
+[core_n12] seen=600000 empty_core=599997 greedy_ok=2 exact_ok=0 undecided=0 hits=0 elapsed=50.1s
+[core_n12] seen=700000 empty_core=699997 greedy_ok=2 exact_ok=0 undecided=0 hits=0 elapsed=58.5s
+[core_n12] seen=800000 empty_core=799997 greedy_ok=2 exact_ok=0 undecided=0 hits=0 elapsed=67.2s
+[core_n12] seen=900000 empty_core=899997 greedy_ok=2 exact_ok=0 undecided=0 hits=0 elapsed=75.6s
+[core_n12] seen=1000000 empty_core=999995 greedy_ok=4 exact_ok=0 undecided=0 hits=0 elapsed=84.2s
+
+Order 12 final output:
+[core_n12] done: graphs=1032644, empty_core=1032640, greedy_core_ok=4, exact_core_ok=0, undecided=0, hits=0, max_core_size=24, max_core_greedy=12
+[core_n12] core_size_hist 0:1032640 24:4
+[core_n12] core_greedy_hist 10:1 12:3
+
+Partial order 13 sample command:
+geng -c -q -D4 13 21:26 | python3 hunt_sweep.py core_n13 --progress 1000000
+
+Partial order 13 output before manual interrupt:
+[core_n13] seen=1000000 empty_core=999999 greedy_ok=0 exact_ok=0 undecided=0 hits=0 elapsed=83.6s
+[core_n13] seen=2000000 empty_core=1999999 greedy_ok=0 exact_ok=0 undecided=0 hits=0 elapsed=167.1s
+
+Interpretation:
+Any graph with at most 10 vertices and Delta <= 4 has at most 20 edges, hence
+is trivially 20-strong-colorable.  Any counterexample on 11 or 12 vertices has
+a connected component with at least 21 edges, so the connected graph6 sweeps
+above cover the only possible cases.  The conflict 20-core is empty for every
+order-11 graph and is greedily 20-colorable for the four nonempty-core order-12
+graphs.  No hard 20-core was reported in the partial order-13 run before the
+manual interrupt.  Therefore the conjecture is soundly verified through 12
+vertices.

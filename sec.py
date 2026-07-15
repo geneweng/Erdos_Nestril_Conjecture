@@ -136,6 +136,67 @@ def verify_strong_coloring(G, coloring):
     return True
 
 
+def core_deletion_order(C, k):
+    """Return the k-core of C and an order for greedily extending its coloring."""
+    H = C.copy()
+    stack = [v for v in H.nodes() if H.degree(v) < k]
+    queued = set(stack)
+    deleted = []
+
+    while stack:
+        v = stack.pop()
+        if v not in H:
+            continue
+        neighbors = list(H.neighbors(v))
+        H.remove_node(v)
+        deleted.append(v)
+        for w in neighbors:
+            if w in H and w not in queued and H.degree(w) < k:
+                stack.append(w)
+                queued.add(w)
+
+    return H, deleted
+
+
+def extend_coloring_from_core(C, core_coloring, deleted, k):
+    """Extend a k-coloring of a k-core through a deletion order."""
+    coloring = dict(core_coloring)
+    for v in reversed(deleted):
+        blocked = {coloring[w] for w in C.neighbors(v) if w in coloring}
+        for color in range(k):
+            if color not in blocked:
+                coloring[v] = color
+                break
+        else:
+            raise ValueError("deletion order is not k-degenerate")
+    return coloring
+
+
+def core_color_certificate(C, k=20, exact=True):
+    """Try to certify k-colorability by coloring the fixed conflict k-core.
+
+    If the k-core is k-colorable, the whole graph is k-colorable by extending
+    along the deletion order.  Returns (True, coloring, core) for a certificate,
+    (False, None, core) for an exact non-k-colorability result, and
+    (None, None, core) if the exact SAT check is disabled and greedy did not
+    certify the core.
+    """
+    core, deleted = core_deletion_order(C, k)
+    if core.number_of_nodes() == 0:
+        return True, extend_coloring_from_core(C, {}, deleted, k), core
+
+    greedy = nx.coloring.greedy_color(core, strategy="DSATUR")
+    if greedy and max(greedy.values()) + 1 <= k:
+        return True, extend_coloring_from_core(C, greedy, deleted, k), core
+    if not exact:
+        return None, None, core
+
+    ok, coloring = sat_colorable(core, k, clique=greedy_clique(core))
+    if ok:
+        return True, extend_coloring_from_core(C, coloring, deleted, k), core
+    return False, None, core
+
+
 def blowup(G, sizes):
     """Blow up each vertex v of G into an independent set of size sizes[v]."""
     H = nx.Graph()
