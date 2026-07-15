@@ -2,14 +2,20 @@
 
 Date: 2026-07-14
 
+> **Withdrawn after SME review, 2026-07-15.** This proof attempt uses
+> colorings of `H - e` and `H - F` as though they were colorings of the fixed
+> conflict graph `L(H)^2` with vertices removed.  That is false for strong
+> coloring: deleting edges from `H` can remove conflicts among the remaining
+> edges.  The reductions to no degree-3 vertices, no triangles, and the
+> 4-regular triangle-free case are not valid proof claims.  The computational
+> logs remain useful exploratory data only.  See [ERRATA.md](ERRATA.md).
+
 Goal: prove that every simple graph with maximum degree at most 4 has strong
 chromatic index at most 20.
 
-Status: no complete proof yet.  The main progress here is that a connected
-edge-critical counterexample is reduced to the 4-regular triangle-free case:
-degree-3 vertices are eliminated using the local Hall/recoloring obstruction
-plus a finite cross-edge check, and triangles are eliminated by a palette
-argument.  The main tools below are:
+Status: no complete proof.  The main reduction claimed in this file has been
+withdrawn.  The notes below are kept to document the failed approach and the
+computational experiments it motivated.  The flawed tools were:
 
 1. a Gallai-forest constraint on the edges with exactly 20 conflicts, and
 2. a Hall-extension obstruction obtained by deleting a degree-3 vertex,
@@ -18,8 +24,8 @@ argument.  The main tools below are:
    arms around a degree-3 vertex, and
 5. a triangle-deletion palette contradiction in the 4-regular case.
 
-These are intended to extend the reductions already recorded in
-`PROOF_NOTES.md`.
+These were intended to extend the reductions recorded in `PROOF_NOTES.md`, but
+the shared edge-deletion premise is invalid.
 
 ## Plan
 
@@ -29,8 +35,10 @@ These are intended to extend the reductions already recorded in
 4. Try to eliminate degree-3 vertices of `H`.
 5. If that succeeds, attack the remaining 4-regular case.
 
-The pass below completes Steps 1--4 and reduces the remaining problem to the
-4-regular triangle-free case.
+The pass below was originally written as if it completed Steps 1--4.  It should
+now be read as a withdrawn attempt.  A valid replacement must work in a
+vertex-21-critical induced subgraph `C0 subset L(G)^2`, not in an edge-critical
+subgraph of `G`.
 
 ## Step 1: Critical Setup
 
@@ -825,14 +833,14 @@ This pushes the next target toward non-tight deletions.  For a deleted star or
 more than Hall's theorem from list sizes alone.  It must exploit the precise
 overlap pattern of the colored conflict neighborhoods.
 
-## Step 10: Reduced Exhaustion for 15 Through 17 Vertices
+## Step 10: Conditional Reduced Exhaustion for 15 Through 17 Vertices
 
-The structural reductions also make the next small-order exhaustive checks
-much cheaper.
+The withdrawn structural reductions motivated the next small-order checks.
+These computations are retained as data about the conditional reduced family,
+not as proof-certified exclusions.
 
-The original exhaustive theorem covered all graphs on at most 14 vertices.
-After Theorems 12 and 13, a connected edge-critical counterexample on more
-vertices must be:
+Under the withdrawn Theorems 12 and 13, a connected edge-critical
+counterexample on more vertices would have had to be:
 
 ```text
 4-regular,
@@ -894,15 +902,12 @@ Thus the current critical-graph filters do not eliminate all of the worst
 greedy examples at order 17: four Gallai-compatible survivors still use
 18 colors under deterministic DSATUR.
 
-Therefore, conditional only on the reductions proved above, there is no
-counterexample on 15, 16, or 17 vertices.  Combined with the original exhaustive
-search through 14 vertices, the current proof/computation package rules out
-counterexamples on at most 17 vertices.
+Therefore, conditional on the withdrawn reductions, there is no counterexample
+inside this reduced family on 15, 16, or 17 vertices.  This does not rule out
+counterexamples on at most 17 vertices in the original problem.
 
-This is still not a general proof.  It does, however, give a much smaller
-search target for future computation: start directly from connected
-4-regular triangle-free graphs with `x(e) <= 4`, rather than all degree-[3,4]
-graphs.
+This is not a proof result.  It remains useful as exploratory evidence about
+the family that the failed reduction singled out.
 
 ## Step 11: Exact Check of the Hardest Order-17 Greedy Cases
 

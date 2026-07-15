@@ -12,54 +12,53 @@ counterexample is precisely a Δ = 4 graph with χ′ₛ = 21. The C₅ blowup
 pairwise-conflicting edges, so the bound is tight.
 
 This repo is a systematic computational hunt for such a counterexample.
-**No counterexample was found**; along the way we obtained rigorous negative
-results. Full write-ups:
+**No counterexample was found in the searches performed**, and one rigorous
+negative result remains central: the strong clique number at `Delta = 4` is
+exactly 20.
 
-* [REPORT.md](REPORT.md) — the counterexample hunt: methods, all searches, data.
-* [PROOF_NOTES.md](PROOF_NOTES.md) — toward a proof: critical-graph lemmas with
-  complete proofs, the two computer-assisted theorems, and an assessment of
-  what a full proof would take.
-* [PROOF_ATTEMPT.md](PROOF_ATTEMPT.md) — latest proof attempt: Gallai-forest
-  constraints, Hall/recoloring obstructions, and a computer-assisted
-  elimination of degree-3 vertices; any remaining critical counterexample is
-  reduced to the 4-regular triangle-free case, with the remaining local
-  obstruction stated as a tight `K4` list-extension problem.
+**Important correction.** An SME review on 2026-07-15 found that the proof notes
+misused edge deletion: a strong coloring of `H - e` is not generally a coloring
+of `L(H)^2 - e`, because deleting `e` can remove conflicts among other edges.
+The claimed edge-critical reductions, including the reduction to the 4-regular
+triangle-free case and proof-certified small-order exclusions based on that
+pruning, are withdrawn. See [ERRATA.md](ERRATA.md).
+
+Full write-ups:
+
+* [ERRATA.md](ERRATA.md) — current correction and replacement proof framework.
+* [REPORT.md](REPORT.md) — historical counterexample-hunt report; read together
+  with the erratum.
+* [PROOF_NOTES.md](PROOF_NOTES.md) — archival proof notes; the edge-critical
+  deletion arguments are withdrawn.
+* [PROOF_ATTEMPT.md](PROOF_ATTEMPT.md) — archival proof attempt; useful as a
+  record of ideas and computations, not as a valid reduction proof.
 
 Highlights:
 
-* **No counterexample exists on ≤ 14 vertices** (exhaustive: 40,414,906 graphs
-  after provable criticality pruning — zero hits, none even reached 20 greedy
-  colors).
-* The latest proof attempt reduces any critical counterexample to the
-  4-regular triangle-free case; the remaining local profiler now also checks
-  Kostochka-Yancey density and Gallai tight-edge compatibility, and a reduced
-  sweep rules out orders 15, 16, and 17 as well (max greedy strong colors 17,
-  18, and 18; the order-17 high-greedy layer packs into at most 13 induced
-  matchings after randomized maximum-matching tie-breaking).
 * **The strong clique number of Δ ≤ 4 graphs is exactly 20** (SAT, with a
   rigorous 28-vertex reduction): the "clique version" of the conjecture holds
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
   strictly above clique number.
+* Exact coloring computations on explicitly generated graphs remain valid; the
+  reduced 4-regular triangle-free sweeps through order 17 are retained as
+  exploratory evidence, not as proof-certified exclusions.
+* Conditional on the now-withdrawn reduction, the order-17 high-greedy layer
+  packs into at most 13 induced matchings after randomized maximum-matching
+  tie-breaking. This is useful data for future conjecture formation, not a
+  theorem about all counterexamples.
 * Structured families (circulants, torus grids, line graphs of cubic graphs,
   cycle blowups — 747 graphs) stay below the bound except for the C₅ blowup
   itself; random-start annealing stays at χ′ₛ ≤ 17, while seeded C₅-blowup
   runs remain at the isolated peak 20 and every mutation collapses it.
-* **Critical-graph structure theory** (proved): a minimal counterexample has
-  min degree 3, its degree-3 vertices pairwise at distance ≥ 3 with rigid
-  tree-like 13-vertex second neighborhoods, every edge in at most one
-  triangle, a local sparsity budget 4t + D + x ≤ 4 per 4–4 edge, and a
-  "frozen rainbow" coloring rigidity around every 3–4 edge
-  (PROOF_NOTES.md §2).
-* **The conjecture is proved at Δ = 4 for**: all graphs on ≤ 14 vertices
-  (exhaustive), all **planar** graphs (Vizing + Four Color Theorem gives
-  exactly 5 × 4 = 20), all **chordal** graphs (perfection of the conflict
-  graph + our clique theorem), and the clique relaxation for all graphs
-  (PROOF_NOTES.md §4½).
+* The proof direction is now to work with a vertex-21-critical induced subgraph
+  `C0 subset L(G)^2`, whose vertices are a selected edge set in the ambient
+  graph. Criticality applies to `C0`, not to edge deletions in `G`.
 
 ## Tooling
 
 This project was carried out with **Claude Code** running the **Claude Fable 5**
-model, which built the solvers, proved the pruning lemmas, and ran the searches:
+model, which built the solvers and ran the searches. Several proof-reduction
+claims have since been withdrawn; see [ERRATA.md](ERRATA.md).
 
 ![Claude Code session kickoff — Claude Fable 5](session-kickoff.png)
 
@@ -90,19 +89,23 @@ brew install nauty          # for geng (exhaustive generation)
 | `hunt_anneal.py` | Simulated annealing over Δ ≤ 4 graphs: `python hunt_anneal.py <n> <seed> <steps>`. |
 | `test_crosscheck.py` | Validation: SAT-based χ′ₛ vs. brute-force backtracking on 60 random graphs. |
 | `results/` | Selected committed logs and search outputs. |
-| `REPORT.md` | Full write-up: methods, pruning lemmas, results, interpretation. |
-| `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Proof notes and the latest partial proof attempt. |
-| `check_degree3_cross_edges.py` | Dependency-free finite check used in `PROOF_ATTEMPT.md` to eliminate cross edges around a degree-3 vertex. |
-| `check_regular_trianglefree_profiles.py` | Dependency-free `geng`-based profiler for the remaining 4-regular triangle-free local case, including KY density, Gallai tight-edge filters, and `--progress` for larger orders. |
-| `check_reduced_small_orders.py` | Reduced exhaustive check after the proof-attempt reductions; defaults to 15 and 16 vertices and supports `--progress` plus `--critical-filters` for larger orders. |
-| `analyze_reduced_extremes.py` | Extracts high-greedy reduced survivors and optionally exact-colors their conflict graphs with a dependency-free bounded DSATUR backtracker; supports direct `--graph6` checks, `--summary-only`, `--structure`, `--witness`, `--witness-details`, `--pack`, and randomized packing knobs `--pack-trials`, `--pack-candidates`, `--pack-seed`. |
+| `ERRATA.md` | Current correction: edge-critical deletion is invalid for strong coloring; replacement conflict-critical framework. |
+| `REPORT.md` | Historical write-up: methods, searches, and interpretation; read with `ERRATA.md`. |
+| `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Archival proof notes; edge-critical deletion arguments are withdrawn. |
+| `check_degree3_cross_edges.py` | Dependency-free finite check from the withdrawn degree-3 proof attempt; retained as conditional/exploratory tooling. |
+| `check_regular_trianglefree_profiles.py` | Dependency-free `geng`-based profiler for the conditional 4-regular triangle-free local case, including KY density, Gallai tight-edge filters, and `--progress` for larger orders. |
+| `check_reduced_small_orders.py` | Conditional reduced-family check after the withdrawn proof-attempt reductions; useful for exploration, not proof certification. |
+| `analyze_reduced_extremes.py` | Extracts high-greedy conditional reduced survivors and optionally exact-colors their conflict graphs with a dependency-free bounded DSATUR backtracker; supports direct `--graph6` checks, `--summary-only`, `--structure`, `--witness`, `--witness-details`, `--pack`, and randomized packing knobs `--pack-trials`, `--pack-candidates`, `--pack-seed`. |
 
-## Reproducing the headline results
+## Reproducing the Unaffected Headline Results
 
 ```sh
 .venv/bin/python sec.py                        # sanity: C5=5, C5 blowup=20, Petersen=5
 .venv/bin/python test_crosscheck.py            # solver cross-validation
 .venv/bin/python hunt_strongclique.py 28       # UNSAT: no 21-edge strong clique, Δ≤4
 .venv/bin/python hunt_strongclique_d.py 3 11   # UNSAT: matches known Δ=3 value
-./run_sweep.sh 11 22 4                         # exhaustive n=11 (seconds)
 ```
+
+Historical/conditional reduced sweeps can still be reproduced from
+`run_sweep.sh`, `check_reduced_small_orders.py`, and
+`analyze_reduced_extremes.py`, but they should be read with [ERRATA.md](ERRATA.md).

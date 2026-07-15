@@ -1,10 +1,11 @@
-"""Analyze high-greedy survivors in the reduced 4-regular triangle-free search.
+"""Analyze high-greedy survivors in the conditional reduced search.
 
-This script is meant for the remaining case in PROOF_ATTEMPT.md.  It scans
-connected 4-regular triangle-free graphs from `geng`, keeps graphs satisfying
-x(e) <= 4, optionally applies the KY density and tight-edge Gallai filters, and
-prints the graphs whose deterministic DSATUR strong coloring uses at least a
-chosen threshold.
+ERRATA.md withdraws the proof-attempt reduction to the 4-regular triangle-free
+case.  This script remains useful exploratory tooling for that conditional
+family.  It scans connected 4-regular triangle-free graphs from `geng`, keeps
+graphs satisfying x(e) <= 4, optionally applies the KY density and tight-edge
+Gallai filters, and prints the graphs whose deterministic DSATUR strong
+coloring uses at least a chosen threshold.
 
 For the selected graphs it can also run a small exact coloring check on the
 strong conflict graph.  The exact checker is dependency-free and intended for

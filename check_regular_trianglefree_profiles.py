@@ -1,4 +1,8 @@
-"""Profile the remaining 4-regular triangle-free case.
+"""Profile the conditional 4-regular triangle-free case.
+
+ERRATA.md withdraws the proof-attempt reduction to this family.  The profiler
+is retained as exploratory tooling for the family that motivated the withdrawn
+argument, not as proof certification for all counterexamples.
 
 This dependency-free helper enumerates connected 4-regular triangle-free graphs
 with nauty `geng`, computes
@@ -11,7 +15,7 @@ conflict graph of a 21-critical counterexample: the Kostochka-Yancey edge
 density lower bound and Gallai's theorem on the tight-edge subgraph.
 
 It is not a coloring proof.  It is a quick way to see which local 4-cycle
-profiles remain after the reductions in PROOF_ATTEMPT.md.
+profiles occur in this conditional family.
 """
 
 from __future__ import annotations

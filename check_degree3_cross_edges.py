@@ -1,4 +1,8 @@
-"""Finite check for the degree-3 proof attempt.
+"""Finite check for the withdrawn degree-3 proof attempt.
+
+ERRATA.md withdraws the edge-deletion premise used by PROOF_ATTEMPT.md.  This
+finite check is still a valid check of the stated local combinatorial rules,
+but those rules no longer prove that a counterexample has no degree-3 vertex.
 
 In the notation of PROOF_ATTEMPT.md, look only at possible cross edges between
 the three sets W1, W2, W3, each of size 3.

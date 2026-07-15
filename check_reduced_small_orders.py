@@ -1,12 +1,13 @@
-"""Reduced exhaustive check after the proof-attempt reductions.
+"""Conditional reduced-family check after the withdrawn proof-attempt reductions.
 
-Using PROOF_ATTEMPT.md, any connected edge-critical counterexample must be
-4-regular, triangle-free, and satisfy x(e) <= 4 on every edge, where x(e) is
-the number of 4-cycles containing e.
+ERRATA.md withdraws the proof that any connected counterexample must be
+4-regular, triangle-free, and satisfy x(e) <= 4 on every edge.  This script
+still enumerates that family because it remains useful exploratory data, but
+its output is not a proof-certified exclusion of counterexamples.
 
 This script enumerates that reduced family for selected orders with `geng` and
 greedily strong-colors each survivor.  A greedy coloring with at most 20 colors
-is a constructive certificate that the graph is not a counterexample.
+is a constructive certificate that the generated graph is not a counterexample.
 Generation is streamed, so larger orders can be monitored with `--progress N`.
 Use `--critical-filters` to color only graphs that also pass the
 Kostochka-Yancey density and tight-edge Gallai necessary conditions.

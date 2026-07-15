@@ -1,13 +1,19 @@
 # Toward a Proof of the Erdős–Nešetřil Conjecture at Δ = 4
 
+> **Erratum, 2026-07-15.** The edge-critical reduction in Sections 1--2 is
+> withdrawn.  A strong coloring of `H - e` is not generally a coloring of the
+> fixed conflict graph `L(H)^2 - e`, because deleting `e` can remove conflicts
+> among other edges.  Consequently the local critical-graph structure derived
+> from edge-minimality is not proof-valid as written.  See
+> [ERRATA.md](ERRATA.md) for the corrected conflict-critical framework.
+
 **Claim to prove.** Every simple graph G with Δ(G) ≤ 4 has strong chromatic index
 χ′ₛ(G) ≤ 20.
 
-**Status.** Not proved here (it has been open since 1985), and that outcome was
-expected. What follows are the *partial results established in this project* —
-several with complete human-readable proofs, two computer-assisted — which
-together reduce the conjecture at Δ = 4 to a sharply constrained minimal case,
-plus an analysis of why the remaining gap resists current techniques.
+**Status.** Not proved here (it has been open since 1985). After the erratum
+above, the edge-critical structural reductions in this file should be read as
+archival failed proof attempts, not established lemmas. The exact computations
+on explicit graphs and the strong-clique SAT theorem remain valid.
 
 Throughout: edges e, f *conflict* if they share an endpoint or are joined by an
 edge of G. For e = uv let S(e) = N[u] ∪ N[v]. The conflict graph C = L(G)² has
@@ -18,7 +24,11 @@ exactly a graph with χ′ₛ = 21: **the entire conjecture at Δ = 4 is one col
 
 ---
 
-## 1. Reduction to a critical graph
+## 1. Withdrawn Reduction to an Edge-Critical Graph
+
+The section below is retained for context, but the central inference is invalid
+for strong coloring.  Edge-minimality of `H` does not imply vertex-criticality
+of `L(H)^2`.
 
 If any counterexample exists, take one, and repeatedly delete edges while
 χ′ₛ = 21. Since strong colorings of disjoint unions are independent per
@@ -37,7 +47,10 @@ S. An edge f conflicts with e iff f has an endpoint in S(e), so
 
   conflicts(e) = Σ_{s∈S(e)} deg(s) − e(S(e)) − 1.
 
-## 2. Structure of a critical counterexample (proved)
+## 2. Withdrawn Structure of an Edge-Critical Counterexample
+
+The statements in this section depend on Lemma A, which depends on the invalid
+edge-deletion inference above.  They are therefore withdrawn as proof claims.
 
 Write d(v) for degrees; all ≤ 4. Let e = uv with t = |N(u) ∩ N(v)|.
 
@@ -158,24 +171,22 @@ graph is a K₂₁-free 21-chromatic graph. The counterexample cannot be certifi
 by local edge density; it would have to be a genuinely global coloring
 obstruction.
 
-## 4. No small counterexample (computer-assisted theorem)
+## 4. Withdrawn: No Small Counterexample Claim
 
-**Theorem F.** The conjecture holds for every graph with Δ ≤ 4 on at most 14
-vertices.
+**Withdrawn claim.** This section was originally presented as a proof that the
+conjecture holds for every graph with Δ ≤ 4 on at most 14 vertices.  The search
+data remain recorded, but the proof certification relied on the withdrawn
+edge-critical pruning from Sections 1--2.
 
-*Method.* A counterexample on ≤ 14 vertices contains a connected edge-critical
-counterexample H on ≤ 14 vertices, which by Lemma B has all degrees in {3, 4}
-and ≥ 21 edges. geng enumerated all such graphs for n = 11–14 — 5,705 +
-284,175 + 3,323,481 + 36,801,545 = 40,414,906 graphs. Each was screened by the
-edge-conflict criterion of Lemma A (a Lemma-A-violating graph cannot be
-critical, and the critical subgraph itself appears elsewhere in the
-enumeration), then DSATUR; any graph whose greedy strong coloring needed ≥ 21
-colors would be decided exactly by SAT. None reached the SAT stage with a
-21-color greedy; in fact no graph even required 20 greedy colors. ∎
+*Historical method.* Under the withdrawn edge-critical reduction, geng
+enumerated connected degree-[3,4] graphs for n = 11–14 — 5,705 + 284,175 +
+3,323,481 + 36,801,545 = 40,414,906 graphs. Each was screened by the withdrawn
+edge-conflict criterion of Lemma A, then DSATUR; any graph whose greedy strong
+coloring needed ≥ 21 colors would be decided exactly by SAT. None reached the
+SAT stage with a 21-color greedy; in fact no graph in that pruned family even
+required 20 greedy colors.
 
-So any counterexample has ≥ 15 vertices — and being nearly 4-regular
-(Corollary D), at least ~30 edges, with conflict graph of ≥ 30 vertices,
-chromatic number 21, clique number ≤ 20, and minimum degree ≥ 20 (Lemma A).
+The conclusion that any counterexample has at least 15 vertices is withdrawn.
 
 ## 4½. Graph classes where the conjecture is proved (Δ = 4)
 
@@ -203,13 +214,15 @@ Random planar Δ ≤ 4 graphs tested here peaked at χ′ₛ = 12.
 Theorem E. ∎ (We corroborated χ = ω on 200 random chordal Δ ≤ 4 instances,
 where every generated conflict graph was itself chordal.)
 
-Together with Theorem F: the conjecture at Δ = 4 now holds for all graphs on
-≤ 14 vertices, all planar graphs, all chordal graphs, and in the clique
-relaxation for all graphs.
+Thus the independent graph-class results currently recorded here are the
+planar case, the chordal case, and the clique relaxation for all graphs.  The
+small-order claim is withdrawn pending an unpruned or conflict-critical
+replacement.
 
 ## 5. Why the last color is hard (assessment)
 
-By Lemma C, Δ(C) ≤ 24. The known landscape for coloring C:
+For any graph with `Delta(G) <= 4`, the conflict graph `C = L(G)^2` has maximum
+degree at most 24.  The known landscape for coloring C:
 
 * Greedy/Brooks-type: χ(C) ≤ 24 — three colors short of useless; the trivial
   bound 2Δ(Δ−1)+1 = 25 is what Brooks-style arguments give at Δ = 4.
@@ -225,30 +238,27 @@ By Lemma C, Δ(C) ≤ 24. The known landscape for coloring C:
 
 The residual problem is exactly a "last color" question, structurally similar
 to the hardest step in edge-coloring theorems: rule out a 21-chromatic,
-K₂₁-free conflict graph arising from a near-4-regular, nearly triangle-free
-graph on ≥ 15 vertices satisfying Lemmas A–D. Two honest routes forward:
+K₂₁-free conflict graph arising as an induced subgraph of some `L(G)^2`.
 
-1. **Extend Theorem F by exhaustion** (n = 15 is ~4×10⁸ candidate graphs after
-   Lemma-B pruning — days of CPU, feasible; n = 16 an order more). This can
-   only ever push the bound, not close the conjecture.
-2. **Sharpen the HSY analysis using Lemmas B–E**: their proof of ≤ 21 already
-   does heavy local case analysis; the rigidity of degree-3 neighborhoods
-   (B.3, D, D′), the 4t + D + x ≤ 4 budget (C), and the frozen-rainbow
-   propagation (E) eliminate many of their configurations at the 20-color
-   level. The most promising first target: prove that a critical
-   counterexample must be **4-regular** by driving the Lemma E cascade around
-   a degree-3 vertex to a contradiction. Whether the remaining cases close is
-   beyond what was checked here — this is where a genuine proof attempt should
-   concentrate.
+After the erratum, the honest route forward is:
+
+1. Choose a vertex-21-critical induced subgraph `C0 subset L(G)^2`.
+2. Translate critical-graph constraints on `C0` back to the selected edge set
+   in `G`.
+3. Count selected conflict neighbors, not total conflicts in `G`.
+4. Rebuild any Hall/list-extension step as an extension of a coloring of
+   `C0 - X`, not as a strong coloring of `G - X`.
+
+The HSY proof of the 21-color bound remains the natural comparison point, but
+the local reductions in Sections 1--2 must first be rebuilt in this
+conflict-critical language.
 
 ## 6. Conclusion
 
-The conjecture at Δ = 4 survived a multi-front computational attack unscathed,
-and the evidence for it is now stronger in two rigorous ways: it holds exactly
-in the clique relaxation (Theorem E, tight at 20), and it has no counterexample
-on ≤ 14 vertices (Theorem F). Every heuristic signal — the isolation of the
-C₅-blowup peak, the collapse of χ′ₛ under any local perturbation, structured
-families plateauing at 13–16 — points the same way. We believe the conjecture
-is true at Δ = 4, with the C₅ blowup as the unique extremal configuration, and
-the gap between 20 and 21 is precisely a global chromatic/clique gap problem
-that current local techniques cannot see.
+The conjecture at Δ = 4 survived the computational searches performed here,
+but after the erratum only the clique relaxation is a rigorous theorem recorded
+in this file.  The heuristic signals remain favorable: the isolation of the
+C₅-blowup peak, the collapse of χ′ₛ under local perturbation, and structured
+families plateauing below 20.  The proof gap is still a global chromatic/clique
+gap problem, but future arguments must use conflict-critical induced subgraphs
+rather than edge-critical deletions in the original graph.
