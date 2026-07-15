@@ -27,7 +27,7 @@ Full write-ups:
 
 * [ERRATA.md](ERRATA.md) — current correction and replacement proof framework.
 * [CONFLICT_CORE.md](CONFLICT_CORE.md) — sound post-erratum core framework and
-  corrected small-order sweeps through 12 vertices.
+  corrected small-order sweeps through 13 vertices.
 * [REPORT.md](REPORT.md) — historical counterexample-hunt report; read together
   with the erratum.
 * [PROOF_NOTES.md](PROOF_NOTES.md) — archival proof notes; the edge-critical
@@ -41,10 +41,11 @@ Highlights:
   rigorous 28-vertex reduction): the "clique version" of the conjecture holds
   tightly at Δ = 4, so any counterexample needs conflict-graph chromatic number
   strictly above clique number.
-* **The conjecture is soundly verified through 12 vertices** using the fixed
+* **The conjecture is soundly verified through 13 vertices** using the fixed
   conflict graph's 20-core, with no edge-deletion criticality assumption.  The
   corrected unpruned sweeps cover 5,705 graphs at order 11 and 1,032,644 graphs
-  at order 12.
+  at order 12; the order-13 sweep covers 37,111,262 graphs, with only 19
+  nonempty 20-cores and all greedily colorable with at most 15 colors.
 * Exact coloring computations on explicitly generated graphs remain valid; the
   reduced 4-regular triangle-free sweeps through order 17 are retained as
   exploratory evidence, not as proof-certified exclusions.
@@ -96,7 +97,7 @@ brew install nauty          # for geng (exhaustive generation)
 | `test_crosscheck.py` | Validation: SAT-based χ′ₛ vs. brute-force backtracking on 60 random graphs. |
 | `results/` | Selected committed logs and search outputs. |
 | `ERRATA.md` | Current correction: edge-critical deletion is invalid for strong coloring; replacement conflict-critical framework. |
-| `CONFLICT_CORE.md` | Sound post-erratum conflict-core lemma and corrected small-order sweeps through 12 vertices. |
+| `CONFLICT_CORE.md` | Sound post-erratum conflict-core lemma and corrected small-order sweeps through 13 vertices. |
 | `REPORT.md` | Historical write-up: methods, searches, and interpretation; read with `ERRATA.md`. |
 | `PROOF_NOTES.md` / `PROOF_ATTEMPT.md` | Archival proof notes; edge-critical deletion arguments are withdrawn. |
 | `check_degree3_cross_edges.py` | Dependency-free finite check from the withdrawn degree-3 proof attempt; retained as conditional/exploratory tooling. |
@@ -122,4 +123,5 @@ Corrected small-order sweep:
 ```sh
 geng -c -q -D4 11 21:22 | python3 hunt_sweep.py core_n11
 geng -c -q -D4 12 21:24 | python3 hunt_sweep.py core_n12
+geng -c -q -D4 13 21:26 PART/8 | python3 hunt_sweep.py core_n13_pPART
 ```

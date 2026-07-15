@@ -47,6 +47,10 @@ is trivially 20-strong-colorable.  Any counterexample on 11 or 12 vertices has
 a connected component with at least 21 edges, so the connected graph6 sweeps
 above cover the only possible cases.  The conflict 20-core is empty for every
 order-11 graph and is greedily 20-colorable for the four nonempty-core order-12
-graphs.  No hard 20-core was reported in the partial order-13 run before the
-manual interrupt.  Therefore the conjecture is soundly verified through 12
-vertices.
+graphs.  Therefore the conjecture is soundly verified through 12 vertices by
+this run.
+
+Superseded order-13 note:
+The partial order-13 run recorded above has since been replaced by a full
+8-partition order-13 sweep; see results/conflict_core_sweep_n13.txt.  Together
+these corrected conflict-core sweeps verify the conjecture through 13 vertices.

@@ -72,4 +72,4 @@ but it removes the invalid step from colorings of `H - e` back to colorings of
 The first implemented replacement is the fixed-conflict-graph 20-core
 certificate in [CONFLICT_CORE.md](CONFLICT_CORE.md): if the 20-core of
 `L(G)^2` is 20-colorable, then `G` is 20-strong-colorable by greedy extension.
-This gives a sound post-erratum verification through 12 vertices.
+This gives a sound post-erratum verification through 13 vertices.

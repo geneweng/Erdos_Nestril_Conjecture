@@ -251,7 +251,7 @@ After the erratum, the honest route forward is:
 
 The first concrete replacement is recorded in [CONFLICT_CORE.md](CONFLICT_CORE.md):
 any counterexample must have a non-20-colorable 20-core in its fixed conflict
-graph.  The corrected core sweep verifies the conjecture through 12 vertices.
+graph.  The corrected core sweep verifies the conjecture through 13 vertices.
 
 The HSY proof of the 21-color bound remains the natural comparison point, but
 the local reductions in Sections 1--2 must first be rebuilt in this
@@ -261,7 +261,7 @@ conflict-critical language.
 
 The conjecture at Δ = 4 survived the computational searches performed here.
 After the erratum, the rigorous results recorded in this repository are the
-clique relaxation and the corrected conflict-core verification through 12
+clique relaxation and the corrected conflict-core verification through 13
 vertices.  The heuristic signals remain favorable: the isolation of the
 C₅-blowup peak, the collapse of χ′ₛ under local perturbation, and structured
 families plateauing below 20.  The proof gap is still a global chromatic/clique

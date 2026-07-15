@@ -41,18 +41,19 @@ dependencies.  It uses the repository's graph6 parser, adjacency-list conflict
 graph, greedy DSATUR upper bound, and bounded exact backtracker for the rare
 case where the 20-core is not greedily certified.
 
-## Corrected Small-Order Result Through 12 Vertices
+## Corrected Small-Order Result Through 13 Vertices
 
 Any graph with at most 10 vertices and `Delta <= 4` has at most 20 edges, so it
 is trivially 20-strong-colorable by giving every edge its own color.  A
-counterexample on at most 12 vertices must therefore have a connected component
-on 11 or 12 vertices with at least 21 edges.
+counterexample on at most 13 vertices must therefore have a connected component
+on 11, 12, or 13 vertices with at least 21 edges.
 
 The corrected unpruned sweeps are:
 
 ```sh
 geng -c -q -D4 11 21:22 | python3 hunt_sweep.py core_n11 --progress 10000
 geng -c -q -D4 12 21:24 | python3 hunt_sweep.py core_n12 --progress 100000
+geng -c -q -D4 13 21:26 PART/8 | python3 hunt_sweep.py core_n13_pPART --progress 1000000
 ```
 
 Results:
@@ -66,27 +67,23 @@ Results:
   exact_core_ok=0, undecided=0, hits=0, max_core_size=24, max_core_greedy=12
 [core_n12] core_size_hist 0:1032640 24:4
 [core_n12] core_greedy_hist 10:1 12:3
+
+order 13 aggregate over 8 partitions:
+graphs=37111262
+empty_core=37111243
+greedy_core_ok=19
+exact_core_ok=0
+undecided=0
+hits=0
+max_core_size=26
+max_core_greedy=15
+core_size_hist 0:37111243 26:19
+core_greedy_hist 12:4 13:7 14:7 15:1
 ```
 
-Thus the conjecture is now soundly verified for all graphs with at most 12
+Thus the conjecture is now soundly verified for all graphs with at most 13
 vertices.  This proof uses no edge-critical deletion in the original graph.
 
-## Order 13 Status
-
-A corrected unpruned order-13 sweep was started:
-
-```sh
-geng -c -q -D4 13 21:26 | python3 hunt_sweep.py core_n13 --progress 1000000
-```
-
-It was interrupted after 2,000,000 generated graphs:
-
-```text
-[core_n13] seen=1000000 empty_core=999999 greedy_ok=0 exact_ok=0
-  undecided=0 hits=0 elapsed=83.6s
-[core_n13] seen=2000000 empty_core=1999999 greedy_ok=0 exact_ok=0
-  undecided=0 hits=0 elapsed=167.1s
-```
-
-No hard 20-core was reported before the interrupt.  A full order-13 run is the
-next natural computational target.
+The next natural computational target is order 14.  The full corrected order-13
+run already generated 37,111,262 connected graphs, so order 14 will likely need
+more batching and resumable logging.

@@ -1,0 +1,72 @@
+Corrected conflict-core sweep for order 13
+Date: 2026-07-15
+
+This sweep uses the fixed conflict graph C = L(G)^2 and the 20-core
+certificate from CONFLICT_CORE.md.  It does not use edge-critical deletion in
+the original graph.
+
+Command pattern:
+geng -c -q -D4 13 21:26 PART/8 | python3 hunt_sweep.py core_n13_pPART --progress 1000000
+
+Partition outputs:
+
+core_n13_p0:
+[core_n13_p0] done: graphs=5406560, empty_core=5406555, greedy_core_ok=5, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=14
+[core_n13_p0] core_size_hist 0:5406555 26:5
+[core_n13_p0] core_greedy_hist 13:3 14:2
+
+core_n13_p1:
+[core_n13_p1] done: graphs=4152950, empty_core=4152950, greedy_core_ok=0, exact_core_ok=0, undecided=0, hits=0, max_core_size=0, max_core_greedy=0
+[core_n13_p1] core_size_hist 0:4152950
+[core_n13_p1] core_greedy_hist
+
+core_n13_p2:
+[core_n13_p2] done: graphs=5614057, empty_core=5614056, greedy_core_ok=1, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=14
+[core_n13_p2] core_size_hist 0:5614056 26:1
+[core_n13_p2] core_greedy_hist 14:1
+
+core_n13_p3:
+[core_n13_p3] done: graphs=4478767, empty_core=4478766, greedy_core_ok=1, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=15
+[core_n13_p3] core_size_hist 0:4478766 26:1
+[core_n13_p3] core_greedy_hist 15:1
+
+core_n13_p4:
+[core_n13_p4] done: graphs=5441849, empty_core=5441843, greedy_core_ok=6, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=14
+[core_n13_p4] core_size_hist 0:5441843 26:6
+[core_n13_p4] core_greedy_hist 12:2 13:1 14:3
+
+core_n13_p5:
+[core_n13_p5] done: graphs=5042558, empty_core=5042555, greedy_core_ok=3, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=14
+[core_n13_p5] core_size_hist 0:5042555 26:3
+[core_n13_p5] core_greedy_hist 13:2 14:1
+
+core_n13_p6:
+[core_n13_p6] done: graphs=3728915, empty_core=3728914, greedy_core_ok=1, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=12
+[core_n13_p6] core_size_hist 0:3728914 26:1
+[core_n13_p6] core_greedy_hist 12:1
+
+core_n13_p7:
+[core_n13_p7] done: graphs=3245606, empty_core=3245604, greedy_core_ok=2, exact_core_ok=0, undecided=0, hits=0, max_core_size=26, max_core_greedy=13
+[core_n13_p7] core_size_hist 0:3245604 26:2
+[core_n13_p7] core_greedy_hist 12:1 13:1
+
+Aggregate:
+graphs=37111262
+empty_core=37111243
+greedy_core_ok=19
+exact_core_ok=0
+undecided=0
+hits=0
+max_core_size=26
+max_core_greedy=15
+core_size_hist 0:37111243 26:19
+core_greedy_hist 12:4 13:7 14:7 15:1
+
+Interpretation:
+Any graph with at most 10 vertices and Delta <= 4 has at most 20 edges, hence
+is trivially 20-strong-colorable.  Any counterexample on 11, 12, or 13 vertices
+has a connected component with at least 21 edges, so the connected graph6
+sweeps through order 13 cover the only possible cases.  The order-13 conflict
+20-core is empty in all but 19 generated graphs; each nonempty core has 26
+vertices and is greedily colorable with at most 15 colors.  Therefore the
+conjecture is soundly verified through 13 vertices.

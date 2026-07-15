@@ -20,7 +20,7 @@ with χ′ₛ = 21.** This project hunted for one.
 **Verdict after correction: no counterexample found in the searches performed,
 and two rigorous post-erratum results are recorded.**  The SAT proof that the
 strong clique number at `Delta = 4` is exactly 20 is unaffected, and the
-corrected conflict-core sweep verifies the conjecture through 12 vertices.  The
+corrected conflict-core sweep verifies the conjecture through 13 vertices.  The
 earlier proof-certified exclusion through 14 vertices relied on withdrawn
 pruning and is now only historical/conditional evidence.  Companion correction:
 [ERRATA.md](ERRATA.md), replacement framework: [CONFLICT_CORE.md](CONFLICT_CORE.md).
@@ -80,7 +80,7 @@ odd-Δ conjecture says max = 29) was still running when this report was written;
 the instance (39-vertex host, 304k clauses) had not resolved after ~1 h.
 [Update here when it finishes.]
 
-## Result 2.5 — Corrected conflict-core sweep through 12 vertices
+## Result 2.5 — Corrected conflict-core sweep through 13 vertices
 
 The corrected post-erratum filter works in the fixed conflict graph
 `C = L(G)^2`.  If the 20-core of `C` is 20-colorable, then `C` is
@@ -93,12 +93,15 @@ The unpruned connected sweeps are:
 n=11: graphs=5,705, empty 20-core=5,705, hits=0
 n=12: graphs=1,032,644, empty 20-core=1,032,640,
       nonempty cores=4, max core greedy colors=12, hits=0
+n=13: graphs=37,111,262, empty 20-core=37,111,243,
+      nonempty cores=19, max core greedy colors=15, hits=0
 ```
 
 Together with the trivial edge-count bound for at most 10 vertices, this
-verifies the conjecture for all graphs on at most 12 vertices.  See
-[CONFLICT_CORE.md](CONFLICT_CORE.md) and
-`results/conflict_core_sweeps_n11_n12.txt`.
+verifies the conjecture for all graphs on at most 13 vertices.  See
+[CONFLICT_CORE.md](CONFLICT_CORE.md),
+`results/conflict_core_sweeps_n11_n12.txt`, and
+`results/conflict_core_sweep_n13.txt`.
 
 ## Result 3 — Structured families plateau far below 20
 
@@ -130,7 +133,7 @@ Delta = 4**, but the proof interpretation is weaker after the erratum:
 
 1. The clique relaxation is now a theorem (max strong clique = 20, attained
    only by the extremal-type configuration in our searches).
-2. The corrected conflict-core sweep verifies the conjecture through 12
+2. The corrected conflict-core sweep verifies the conjecture through 13
    vertices without edge-deletion criticality.
 3. The small-order and reduced-family searches found no counterexample in the
    families tested, but the proof that those families contain all
