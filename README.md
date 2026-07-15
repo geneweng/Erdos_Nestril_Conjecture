@@ -12,9 +12,10 @@ counterexample is precisely a Δ = 4 graph with χ′ₛ = 21. The C₅ blowup
 pairwise-conflicting edges, so the bound is tight.
 
 This repo is a systematic computational hunt for such a counterexample.
-**No counterexample was found in the searches performed**, and one rigorous
-negative result remains central: the strong clique number at `Delta = 4` is
-exactly 20.
+**No counterexample was found in the searches performed**, and two rigorous
+post-erratum results are now central: the strong clique number at `Delta = 4`
+is exactly 20, and the conjecture is verified through 13 vertices by the
+fixed-conflict-graph 20-core method.
 
 **Important correction.** An SME review on 2026-07-15 found that the proof notes
 misused edge deletion: a strong coloring of `H - e` is not generally a coloring
